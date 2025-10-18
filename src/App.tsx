@@ -10,9 +10,10 @@ import {
   GoogleOutlined,
   GithubOutlined,
   DashboardOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 
-import dataProvider from "@refinedev/simple-rest";
+import { dataProvider } from "./providers/dataProvider";
 import routerProvider, {
   NavigateToResource,
   CatchAllNavigate,
@@ -20,16 +21,16 @@ import routerProvider, {
   DocumentTitleHandler,
 } from "@refinedev/react-router";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
-import { App as AntdApp, ConfigProvider } from "antd";
+import { App as AntdApp, ConfigProvider, Form, Input } from "antd";
 
 import "@ant-design/v5-patch-for-react-19";
 import "@refinedev/antd/dist/reset.css";
+import "./index.css";
 
-import { PostList, PostEdit, PostShow } from "../src/pages/posts";
+import { PetList, PetEdit, PetShow, PetCreate } from "../src/pages/pets";
 import { DashboardPage } from "../src/pages/dashboard";
+import { RegisterPage } from "../src/pages/register";
 import { authProvider } from "./providers/authProvider";
-
-const API_URL = "http://localhost:3000/api";
 
 const App: React.FC = () => {
   return (
@@ -38,7 +39,7 @@ const App: React.FC = () => {
         <AntdApp>
           <Refine
             authProvider={authProvider}
-            dataProvider={dataProvider(API_URL)}
+            dataProvider={dataProvider}
             routerProvider={routerProvider}
             resources={[
               {
@@ -50,10 +51,15 @@ const App: React.FC = () => {
                 },
               },
               {
-                name: "posts",
-                list: "/posts",
-                show: "/posts/show/:id",
-                edit: "/posts/edit/:id",
+                name: "pets",
+                list: "/pets",
+                create: "/pets/create",
+                show: "/pets/show/:id",
+                edit: "/pets/edit/:id",
+                meta: {
+                  label: "Pets",
+                  icon: <HomeOutlined />,
+                },
               },
             ]}
             notificationProvider={useNotificationProvider}
@@ -76,18 +82,18 @@ const App: React.FC = () => {
                 }
               >
                 <Route index element={<DashboardPage />} />
-
-                <Route path="/posts">
-                  <Route index element={<PostList />} />
-                  <Route path="edit/:id" element={<PostEdit />} />
-                  <Route path="show/:id" element={<PostShow />} />
+                <Route path="/pets">
+                  <Route index element={<PetList />} />
+                  <Route path="create" element={<PetCreate />} />
+                  <Route path="edit/:id" element={<PetEdit />} />
+                  <Route path="show/:id" element={<PetShow />} />
                 </Route>
               </Route>
 
               <Route
                 element={
                   <Authenticated key="auth-pages" fallback={<Outlet />}>
-                    <NavigateToResource resource="posts" />
+                    <NavigateToResource resource="pets" />
                   </Authenticated>
                 }
               >
@@ -126,41 +132,7 @@ const App: React.FC = () => {
                     />
                   }
                 />
-                <Route
-                  path="/register"
-                  element={
-                    <AuthPage
-                      type="register"
-                      title={false}
-                      // providers={[
-                      //   {
-                      //     name: "google",
-                      //     label: "Sign in with Google",
-                      //     icon: (
-                      //       <GoogleOutlined
-                      //         style={{
-                      //           fontSize: 24,
-                      //           lineHeight: 0,
-                      //         }}
-                      //       />
-                      //     ),
-                      //   },
-                      //   {
-                      //     name: "github",
-                      //     label: "Sign in with GitHub",
-                      //     icon: (
-                      //       <GithubOutlined
-                      //         style={{
-                      //           fontSize: 24,
-                      //           lineHeight: 0,
-                      //         }}
-                      //       />
-                      //     ),
-                      //   },
-                      // ]}
-                    />
-                  }
-                />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route
                   path="/forgot-password"
                   element={<AuthPage type="forgotPassword" />}

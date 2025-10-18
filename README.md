@@ -30,6 +30,116 @@
 
 </div>
 
+## Animal Rescue Frontend
+
+This is the frontend application for the Animal Rescue project, built with React, TypeScript, and Refine.
+
+## Features
+
+- User authentication and authorization
+- CRUD operations for managing animals, rescues, reports, and adoptions
+- File upload support for images and documents
+- Responsive design with Ant Design components
+- Error handling and user feedback
+
+## Technology Stack
+
+- **React 19**: UI library
+- **TypeScript**: Type safety
+- **Refine**: Headless framework for building CRUD applications
+- **Ant Design**: UI component library
+- **Axios**: HTTP client for API requests
+- **Vite**: Build tool
+
+## Project Structure
+
+```
+src/
+├── components/       # Reusable React components
+├── hooks/           # Custom React hooks
+├── interfaces/      # TypeScript type definitions
+├── pages/           # Page components
+├── providers/       # Data and authentication providers
+├── utils/           # Utility functions
+└── App.tsx          # Main application component
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20 or higher
+- npm or yarn
+
+### Installation
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env` file in the root directory and add the following:
+   ```
+   VITE_API_URL=http://localhost:3000/api
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+### Build for Production
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Preview the production build:
+   ```bash
+   npm run preview
+   ```
+
+## Key Components
+
+### Data Provider
+
+The custom data provider handles all API requests to the backend. It's implemented in `src/providers/dataProvider.tsx` and provides methods for:
+
+- CRUD operations (create, read, update, delete)
+- Batch operations
+- File uploads
+- Custom API requests
+
+### Authentication Provider
+
+The authentication provider handles user authentication and authorization. It's implemented in `src/providers/authProvider.tsx` and provides methods for:
+
+- Login and logout
+- Registration
+- Token management
+- Permission checking
+
+### Custom Hooks
+
+The custom hooks in `src/hooks/useApi.ts` provide convenient ways to interact with the data provider:
+
+- `useApiList`: Fetch a list of items
+- `useApiOne`: Fetch a single item
+- `useApiCreate`: Create a new item
+- `useApiUpdate`: Update an existing item
+- `useApiDelete`: Delete an item
+- `useApiCustom`: Make custom API requests
+- `useFileUpload`: Upload files
+
+### Error Handling
+
+Error handling is centralized in `src/utils/errorHandler.ts` and provides:
+
+- Consistent error processing
+- User-friendly error messages
+- Success, warning, and info message utilities
+
 ## Try this example on your local
 
 ```bash

@@ -5,12 +5,17 @@ import {
   ErrorComponent,
   AuthPage,
   RefineThemes,
+  ThemedSider,
 } from "@refinedev/antd";
 import {
   GoogleOutlined,
   GithubOutlined,
   DashboardOutlined,
   HomeOutlined,
+  UserOutlined,
+  HeartOutlined,
+  FileTextOutlined,
+  SafetyOutlined,
 } from "@ant-design/icons";
 
 import { dataProvider } from "./providers/dataProvider";
@@ -28,6 +33,25 @@ import "@refinedev/antd/dist/reset.css";
 import "./index.css";
 
 import { PetList, PetEdit, PetShow, PetCreate } from "../src/pages/pets";
+import { UserList, UserEdit, UserShow, UserCreate } from "../src/pages/users";
+import {
+  AdoptionList,
+  AdoptionEdit,
+  AdoptionShow,
+  AdoptionCreate,
+} from "../src/pages/adoptions";
+import {
+  ReportList,
+  ReportEdit,
+  ReportShow,
+  ReportCreate,
+} from "../src/pages/reports";
+import {
+  RescueList,
+  RescueEdit,
+  RescueShow,
+  RescueCreate,
+} from "../src/pages/rescues";
 import { DashboardPage } from "../src/pages/dashboard";
 import { RegisterPage } from "../src/pages/register";
 import { authProvider } from "./providers/authProvider";
@@ -61,11 +85,59 @@ const App: React.FC = () => {
                   icon: <HomeOutlined />,
                 },
               },
+              {
+                name: "users",
+                list: "/users",
+                create: "/users/create",
+                show: "/users/show/:id",
+                edit: "/users/edit/:id",
+                meta: {
+                  label: "Users",
+                  icon: <UserOutlined />,
+                },
+              },
+              {
+                name: "adoptions",
+                list: "/adoptions",
+                create: "/adoptions/create",
+                show: "/adoptions/show/:id",
+                edit: "/adoptions/edit/:id",
+                meta: {
+                  label: "Adoptions",
+                  icon: <HeartOutlined />,
+                },
+              },
+              {
+                name: "reports",
+                list: "/reports",
+                create: "/reports/create",
+                show: "/reports/show/:id",
+                edit: "/reports/edit/:id",
+                meta: {
+                  label: "Reports",
+                  icon: <FileTextOutlined />,
+                },
+              },
+              {
+                name: "rescues",
+                list: "/rescues",
+                create: "/rescues/create",
+                show: "/rescues/show/:id",
+                edit: "/rescues/edit/:id",
+                meta: {
+                  label: "Rescues",
+                  icon: <SafetyOutlined />,
+                },
+              },
             ]}
             notificationProvider={useNotificationProvider}
             options={{
               syncWithLocation: true,
               warnWhenUnsavedChanges: true,
+              disableServerSideValidation: true,
+              title: {
+                text: "Animal Shelter",
+              },
             }}
           >
             <Routes>
@@ -75,7 +147,7 @@ const App: React.FC = () => {
                     key="authenticated-routes"
                     fallback={<CatchAllNavigate to="/login" />}
                   >
-                    <ThemedLayout>
+                    <ThemedLayout Sider={() => <ThemedSider fixed />}>
                       <Outlet />
                     </ThemedLayout>
                   </Authenticated>
@@ -87,6 +159,30 @@ const App: React.FC = () => {
                   <Route path="create" element={<PetCreate />} />
                   <Route path="edit/:id" element={<PetEdit />} />
                   <Route path="show/:id" element={<PetShow />} />
+                </Route>
+                <Route path="/users">
+                  <Route index element={<UserList />} />
+                  <Route path="create" element={<UserCreate />} />
+                  <Route path="edit/:id" element={<UserEdit />} />
+                  <Route path="show/:id" element={<UserShow />} />
+                </Route>
+                <Route path="/adoptions">
+                  <Route index element={<AdoptionList />} />
+                  <Route path="create" element={<AdoptionCreate />} />
+                  <Route path="edit/:id" element={<AdoptionEdit />} />
+                  <Route path="show/:id" element={<AdoptionShow />} />
+                </Route>
+                <Route path="/reports">
+                  <Route index element={<ReportList />} />
+                  <Route path="create" element={<ReportCreate />} />
+                  <Route path="edit/:id" element={<ReportEdit />} />
+                  <Route path="show/:id" element={<ReportShow />} />
+                </Route>
+                <Route path="/rescues">
+                  <Route index element={<RescueList />} />
+                  <Route path="create" element={<RescueCreate />} />
+                  <Route path="edit/:id" element={<RescueEdit />} />
+                  <Route path="show/:id" element={<RescueShow />} />
                 </Route>
               </Route>
 

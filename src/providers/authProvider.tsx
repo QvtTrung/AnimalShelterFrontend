@@ -155,25 +155,43 @@ export const authProvider: AuthProvider = {
     return { error };
   },
 
-  // getIdentity: async () => {
-  //   const directusUserStr = localStorage.getItem("directusUser");
-  //   const appUserStr = localStorage.getItem("appUser");
+  getIdentity: async () => {
+    const directusUserStr = localStorage.getItem("directusUser");
+    const appUserStr = localStorage.getItem("appUser");
 
-  //   if (directusUserStr) {
-  //     const directusUser = JSON.parse(directusUserStr);
-  //     const appUser = appUserStr ? JSON.parse(appUserStr) : null;
+    console.log("getIdentity - directusUserStr:", directusUserStr);
+    console.log("getIdentity - appUserStr:", appUserStr);
 
-  //     // Return user identity in the format expected by Refine
-  //     return {
-  //       id: directusUser.id,
-  //       name: `${directusUser.first_name} ${directusUser.last_name}`,
-  //       email: directusUser.email,
-  //       avatar: appUser?.avatar, // Use avatar from app user if available
-  //     };
-  //   }
+    if (directusUserStr) {
+      const directusUser = JSON.parse(directusUserStr);
+      const appUser = appUserStr ? JSON.parse(appUserStr) : null;
 
-  //   return null;
-  // },
+      console.log("getIdentity - directusUser:", directusUser);
+      console.log("getIdentity - appUser:", appUser);
+
+      // Return user identity in the format expected by Refine
+      const identity = {
+        id: directusUser.id,
+        first_name: directusUser.first_name || "",
+        last_name: directusUser.last_name || "",
+        name: `${directusUser.first_name || ""} ${directusUser.last_name || ""}`.trim(),
+        email: directusUser.email || "",
+        avatar: appUser?.avatar || null,
+        role: directusUser.role || "user",
+        status: directusUser.status || "active",
+        date_created: directusUser.date_created || new Date().toISOString(),
+        date_updated: directusUser.date_updated || new Date().toISOString(),
+        language: directusUser.language || "English",
+        timezone: directusUser.timezone || "UTC",
+      };
+
+      console.log("getIdentity - returning identity:", identity);
+      return identity;
+    }
+
+    console.log("getIdentity - no directus user found, returning null");
+    return null;
+  },
 
   // updatePassword: async ({ currentPassword, newPassword }) => {
   //   try {
@@ -215,9 +233,23 @@ export const authProvider: AuthProvider = {
   //   }
   // },
 
-  // getPermissions: async () => {
-  //   // If your backend returns permissions, you can fetch and return them here
-  //   // For now, return an empty array or a default permission
-  //   return [];
-  // },
+  getPermissions: async () => {
+    // Try to get permissions from localStorage or fetch from API
+    const directusUserStr = localStorage.getItem("directusUser");
+
+    console.log("getPermissions - directusUserStr:", directusUserStr);
+
+    if (directusUserStr) {
+      const directusUser = JSON.parse(directusUserStr);
+      console.log("getPermissions - directusUser:", directusUser);
+
+      // Return user role as permission
+      const permissions = [directusUser.role || "user"];
+      console.log("getPermissions - returning permissions:", permissions);
+      return permissions;
+    }
+
+    console.log("getPermissions - no directus user found, returning empty array");
+    return [];
+  },
 };

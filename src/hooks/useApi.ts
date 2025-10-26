@@ -1,5 +1,5 @@
 
-import { useCustom, useList, useOne, useCreate, useUpdate, useDelete } from "@refinedev/core";
+import { useCustom, useList, useOne, useCreate, useUpdate, useDelete, useCustomMutation } from "@refinedev/core";
 import { uploadFile, createUploadRequest } from "../utils/upload";
 import axios from "axios";
 
@@ -50,11 +50,16 @@ export const useApi = () => {
 
   // Hook for custom API requests
   const useApiCustom = (url: string, method: string, config?: any) => {
-    return useCustom({
+    const result = useCustom({
       url,
       method,
       ...config,
     });
+
+    // // Log the response for debugging
+    // console.log("useApiCustom result:", result);
+
+    return result;
   };
 
   // Hook for file uploads
@@ -92,6 +97,15 @@ export const useApi = () => {
     };
   };
 
+  // Hook for custom mutations (POST, PUT, DELETE, etc.)
+  const useApiMutation = (url: string, method: string, config?: any) => {
+    return useCustomMutation({
+      url,
+      method,
+      ...config,
+    });
+  };
+
   return {
     useApiList,
     useApiOne,
@@ -99,6 +113,7 @@ export const useApi = () => {
     useApiUpdate,
     useApiDelete,
     useApiCustom,
+    useApiMutation,
     useFileUpload,
   };
 };

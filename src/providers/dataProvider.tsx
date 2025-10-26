@@ -8,9 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Create axios instance for making API calls
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // Don't set default Content-Type to allow FormData to set it automatically
   withCredentials: true,
 });
 
@@ -79,7 +77,7 @@ export const dataProvider: DataProvider = {
 
       return {
         data: response.data.data,
-        total: response.data.total || response.data.data.length,
+        total: response.data.meta?.total || response.data.total || response.data.data.length,
       };
     } catch (error: any) {
       throw error; // Error is already processed by handleApiError
@@ -147,7 +145,8 @@ export const dataProvider: DataProvider = {
   // Custom method to handle data export
   custom: async ({ url, method, payload, query, headers, meta }) => {
     try {
-      let requestUrl = url.startsWith("/") ? `${API_URL}${url}` : url;
+      // Check if url is defined before using startsWith
+      let requestUrl = url && url.startsWith("/") ? `${API_URL}${url}` : (url || "");
 
       const config: any = {
         method,
@@ -161,11 +160,21 @@ export const dataProvider: DataProvider = {
 
       // Handle different payload types
       if (payload) {
+        // Debug payload type
+        console.log("Payload type:", typeof payload);
+        console.log("Is FormData:", payload instanceof FormData);
+        
         // If payload is FormData, don't set Content-Type header
         if (payload instanceof FormData) {
+          console.log("FormData entries before sending:");
+          for (let pair of payload.entries()) {
+            console.log(pair[0] + ": ", pair[1]);
+          }
           config.data = payload;
+          // Let the browser set the Content-Type header for FormData
         } else {
           config.data = payload;
+          // Set Content-Type for JSON payloads
           config.headers = { "Content-Type": "application/json" };
         }
       }

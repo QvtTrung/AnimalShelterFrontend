@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "@refinedev/antd";
 import { Form, Input, Select, Button } from "antd";
-import type { IUser } from "../interfaces";
+import type { IUser } from "../../interfaces";
 
 interface UserFormProps {
   id?: string;
@@ -9,6 +9,8 @@ interface UserFormProps {
 }
 
 export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
+  const [roles, setRoles] = useState<Array<{ id: string; name: string }>>([]);
+
   const {
     formProps,
     saveButtonProps,
@@ -21,6 +23,15 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
   });
 
   const userData = queryResult?.data?.data;
+
+  // Use predefined role names
+  useEffect(() => {
+    setRoles([
+      { id: "User", name: "User" },
+      { id: "Staff", name: "Staff" },
+      { id: "Administrator", name: "Administrator" },
+    ]);
+  }, []);
 
   return (
     <Form {...formProps} layout="vertical" initialValues={userData}>
@@ -79,6 +90,24 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
       </Form.Item>
       <Form.Item label="Address" name="address">
         <Input.TextArea rows={4} />
+      </Form.Item>
+      <Form.Item
+        label="Role"
+        name="role"
+        rules={[
+          {
+            required: true,
+            message: "Please select a role",
+          },
+        ]}
+      >
+        <Select
+          placeholder="Select a role"
+          options={roles.map((role) => ({
+            label: role.name,
+            value: role.id,
+          }))}
+        />
       </Form.Item>
       <Form.Item
         label="Status"

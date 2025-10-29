@@ -133,7 +133,7 @@ export const DashboardPage: React.FC = () => {
         </Card>
       </Col>
       <Col xs={24}>
-        <Card title="Location Map" variant="borderless">
+        <Card title="Animal Rescue Map" variant="borderless">
           <div style={{ height: "400px", width: "100%" }}>
             <MapContainer
               center={position}

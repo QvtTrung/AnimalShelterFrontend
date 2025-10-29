@@ -1,7 +1,7 @@
 // RescueEdit.tsx
 import { Edit, useForm } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
-import { RescueForm } from "../../components/RescueForm";
+import { RescueForm } from "../../components/Forms/RescueForm";
 
 export const RescueEdit = () => {
   const { params } = useParsed();

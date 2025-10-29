@@ -54,6 +54,11 @@ export const useApi = () => {
       url,
       method,
       ...config,
+      headers: {
+        // Include authentication header
+        Authorization: localStorage.getItem("token") ? `Bearer ${localStorage.getItem("token")}` : undefined,
+        ...(config?.headers || {})
+      }
     });
 
     // // Log the response for debugging

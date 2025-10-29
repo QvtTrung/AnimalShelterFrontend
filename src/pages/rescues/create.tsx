@@ -1,6 +1,6 @@
 // RescueCreate.tsx
 import { Create, useForm } from "@refinedev/antd";
-import { RescueForm } from "../../components/RescueForm";
+import { RescueForm } from "../../components/Forms/RescueForm";
 
 export const RescueCreate = () => {
   const { formProps, saveButtonProps } = useForm();

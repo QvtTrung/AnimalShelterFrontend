@@ -25,6 +25,7 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
@@ -174,10 +175,12 @@ export const authProvider: AuthProvider = {
         id: directusUser.id,
         first_name: directusUser.first_name || "",
         last_name: directusUser.last_name || "",
-        name: `${directusUser.first_name || ""} ${directusUser.last_name || ""}`.trim(),
+        name: `${directusUser.first_name || ""} ${
+          directusUser.last_name || ""
+        }`.trim(),
         email: directusUser.email || "",
         avatar: appUser?.avatar || null,
-        role: directusUser.role || "user",
+        role: appUser?.role || "User",
         status: directusUser.status || "active",
         date_created: directusUser.date_created || new Date().toISOString(),
         date_updated: directusUser.date_updated || new Date().toISOString(),
@@ -243,13 +246,17 @@ export const authProvider: AuthProvider = {
       const directusUser = JSON.parse(directusUserStr);
       console.log("getPermissions - directusUser:", directusUser);
 
-      // Return user role as permission
-      const permissions = [directusUser.role || "user"];
+      // Get role name from appUser
+      const appUserStr = localStorage.getItem("appUser");
+      const appUser = appUserStr ? JSON.parse(appUserStr) : null;
+      const permissions = [appUser?.role || "User"];
       console.log("getPermissions - returning permissions:", permissions);
       return permissions;
     }
 
-    console.log("getPermissions - no directus user found, returning empty array");
+    console.log(
+      "getPermissions - no directus user found, returning empty array"
+    );
     return [];
   },
 };

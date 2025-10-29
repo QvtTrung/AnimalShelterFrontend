@@ -14,8 +14,8 @@ import {
   Popconfirm,
 } from "antd";
 import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useApi } from "../hooks/useApi";
-import { uploadFile } from "../utils/upload";
+import { useApi } from "../../hooks/useApi";
+import { uploadFile } from "../../utils/upload";
 
 interface PetFormProps {
   formProps: any;
@@ -112,11 +112,9 @@ export const PetForm: React.FC<PetFormProps> = ({
     useEffect(() => {
       if (imageData && petId) {
         console.log("API Response:", imageData);
-        // Check if imageData has the expected structure before accessing nested properties
-        if (imageData.data && imageData.data.data) {
+        // Check if imageData.data.data exists and is an array
+        if (Array.isArray(imageData.data.data)) {
           setExistingImages(imageData.data.data);
-        } else if (imageData.data && Array.isArray(imageData.data)) {
-          setExistingImages(imageData.data);
         } else {
           setExistingImages([]);
         }

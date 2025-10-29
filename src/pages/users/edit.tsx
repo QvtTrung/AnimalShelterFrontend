@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit } from "@refinedev/antd";
 import { useNavigation, useParsed } from "@refinedev/core";
-import { UserForm } from "../../components/UserForm";
+import { UserForm } from "../../components/Forms/UserForm";
 
 export const UserEdit = () => {
   const { list } = useNavigation();
@@ -10,10 +10,7 @@ export const UserEdit = () => {
 
   return (
     <Edit saveButtonProps={{ style: { display: "none" } }}>
-      <UserForm
-        id={id}
-        onSuccess={() => list("users")}
-      />
+      <UserForm id={id} onSuccess={() => list("users")} />
     </Edit>
   );
 };

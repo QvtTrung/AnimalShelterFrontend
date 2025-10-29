@@ -1,7 +1,7 @@
 // AdoptionEdit.tsx
 import { Edit, useForm } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
-import { AdoptionForm } from "../../components/AdoptionForm";
+import { AdoptionForm } from "../../components/Forms/AdoptionForm";
 
 export const AdoptionEdit = () => {
   const { params } = useParsed();

@@ -77,7 +77,10 @@ export const dataProvider: DataProvider = {
 
       return {
         data: response.data.data,
-        total: response.data.meta?.total || response.data.total || response.data.data.length,
+        total:
+          response.data.meta?.total ||
+          response.data.total ||
+          response.data.data.length,
       };
     } catch (error: any) {
       throw error; // Error is already processed by handleApiError
@@ -146,7 +149,8 @@ export const dataProvider: DataProvider = {
   custom: async ({ url, method, payload, query, headers, meta }) => {
     try {
       // Check if url is defined before using startsWith
-      let requestUrl = url && url.startsWith("/") ? `${API_URL}${url}` : (url || "");
+      let requestUrl =
+        url && url.startsWith("/") ? `${API_URL}${url}` : url || "";
 
       const config: any = {
         method,
@@ -163,7 +167,7 @@ export const dataProvider: DataProvider = {
         // Debug payload type
         console.log("Payload type:", typeof payload);
         console.log("Is FormData:", payload instanceof FormData);
-        
+
         // If payload is FormData, don't set Content-Type header
         if (payload instanceof FormData) {
           console.log("FormData entries before sending:");
@@ -171,11 +175,14 @@ export const dataProvider: DataProvider = {
             console.log(pair[0] + ": ", pair[1]);
           }
           config.data = payload;
-          // Let the browser set the Content-Type header for FormData
+          // Let the browser set the Content-Type header for FormData with boundary
+          // Don't set any headers that might interfere with FormData processing
+          // Remove any existing headers that might conflict
+          delete config.headers;
         } else {
           config.data = payload;
           // Set Content-Type for JSON payloads
-          config.headers = { "Content-Type": "application/json" };
+          config.headers["Content-Type"] = "application/json";
         }
       }
 

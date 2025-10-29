@@ -17,8 +17,8 @@ import type { IReport } from "../../interfaces";
 export const ReportList = () => {
   const { tableProps } = useTable<IReport>({
     meta: {
-      select: "*, reporter_user.first_name, reporter_user.last_name"
-    }
+      select: "*, user_created_user.first_name, user_created_user.last_name",
+    },
   });
 
   return (
@@ -29,26 +29,43 @@ export const ReportList = () => {
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="title" title="Title" />
-        <Table.Column dataIndex="species" title="Species" />
-        <Table.Column 
-          dataIndex={["reporter_user", "first_name"]} 
-          title="Reporter First Name" 
+        <Table.Column
+          dataIndex="description"
+          title="Description"
+          ellipsis={true}
         />
-        <Table.Column 
-          dataIndex={["reporter_user", "last_name"]} 
-          title="Reporter Last Name" 
+        <Table.Column dataIndex="species" title="Species" />
+        <Table.Column dataIndex="location" title="Location" />
+        <Table.Column
+          dataIndex={["user_created_user", "first_name"]}
+          title="Reporter"
+          render={(_, record) => {
+            const firstName = record?.user_created_user?.first_name || "";
+            const lastName = record?.user_created_user?.last_name || "";
+            return `${firstName} ${lastName}`.trim() || "N/A";
+          }}
         />
         <Table.Column
           dataIndex="type"
           title="Type"
+          render={(value) => {
+            let color = "default";
+            if (value === "abuse") color = "red";
+            else if (value === "abandonment") color = "orange";
+            else if (value === "injured_animal") color = "blue";
+            else if (value === "other") color = "gray";
+
+            return <Tag color={color}>{value}</Tag>;
+          }}
         />
         <Table.Column
           dataIndex="urgency_level"
           title="Urgency Level"
           render={(value) => {
             let color = "default";
-            if (value === "high") color = "red";
-            else if (value === "medium") color = "orange";
+            if (value === "critical") color = "red";
+            else if (value === "high") color = "orange";
+            else if (value === "medium") color = "yellow";
             else if (value === "low") color = "green";
 
             return <Tag color={color}>{value}</Tag>;
@@ -65,6 +82,11 @@ export const ReportList = () => {
 
             return <Tag color={color}>{value}</Tag>;
           }}
+        />
+        <Table.Column
+          dataIndex="date_created"
+          title="Date Created"
+          render={(value) => new Date(value).toLocaleDateString()}
         />
         <Table.Column
           title="Actions"

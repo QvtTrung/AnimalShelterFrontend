@@ -25,6 +25,8 @@ export interface IUser {
   phone_number?: string;
   avatar?: string;
   address?: string;
+  role?: string;
+  role_name?: string;
   date_created?: string;
   date_updated?: string;
 }
@@ -45,16 +47,16 @@ export interface IAdoption {
 export interface IReport {
   id: string;
   status: "pending" | "assigned" | "resolved";
-  species?: string;
-  description?: string;
-  reporter?: string;
-  location?: string;
-  title?: string;
-  type?: string;
-  urgency_level?: string;
+  species: string;
+  description: string;
+  location: string;
+  title: string;
+  type: "abuse" | "abandonment" | "injured_animal" | "other";
+  urgency_level: "low" | "medium" | "high" | "critical";
   date_created?: string;
   date_updated?: string;
-  reporter_user?: IUser;
+  user_created?: string;
+  user_created_user?: IUser;
 }
 
 export interface IRescue {

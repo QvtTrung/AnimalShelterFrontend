@@ -1,11 +1,9 @@
 import { GitHubBanner, Refine, Authenticated } from "@refinedev/core";
 import {
   useNotificationProvider,
-  ThemedLayout,
   ErrorComponent,
   AuthPage,
   RefineThemes,
-  ThemedSider,
 } from "@refinedev/antd";
 import {
   GoogleOutlined,
@@ -55,6 +53,10 @@ import {
 import { DashboardPage } from "../src/pages/dashboard";
 import { RegisterPage } from "../src/pages/register";
 import { authProvider } from "./providers/authProvider";
+import { ThemedHeader } from "./components/layout/header";
+import { ThemedLayout } from "./components/layout";
+import { ThemedSider } from "./components/layout/sider";
+import { ThemedTitle } from "./components/layout/title";
 
 const App: React.FC = () => {
   return (
@@ -147,7 +149,11 @@ const App: React.FC = () => {
                     key="authenticated-routes"
                     fallback={<CatchAllNavigate to="/login" />}
                   >
-                    <ThemedLayout Sider={() => <ThemedSider fixed />}>
+                    <ThemedLayout
+                      Header={ThemedHeader}
+                      Sider={ThemedSider}
+                      Title={ThemedTitle}
+                    >
                       <Outlet />
                     </ThemedLayout>
                   </Authenticated>
@@ -199,6 +205,8 @@ const App: React.FC = () => {
                     <AuthPage
                       type="login"
                       title={false}
+                      registerLink={false}
+                      forgotPasswordLink={false}
                       // providers={[
                       //   {
                       //     name: "google",

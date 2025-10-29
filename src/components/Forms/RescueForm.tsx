@@ -1,7 +1,7 @@
 // RescueForm.tsx
 import React from "react";
 import { Form, Select, InputNumber, Button, Input } from "antd";
-import type { IRescue } from "../interfaces";
+import type { IRescue } from "../../interfaces";
 
 interface RescueFormProps {
   formProps: any;

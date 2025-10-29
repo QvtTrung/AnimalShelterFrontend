@@ -1,3 +1,4 @@
+import React from "react";
 import {
   List,
   TextField,
@@ -28,6 +29,14 @@ export const UserList = () => {
         <Table.Column dataIndex="first_name" title="First Name" />
         <Table.Column dataIndex="last_name" title="Last Name" />
         <Table.Column dataIndex="phone_number" title="Phone Number" />
+        <Table.Column
+          dataIndex="role"
+          title="Role"
+          render={(value) => {
+            // If role is available, display it
+            return value || "Not assigned";
+          }}
+        />
         <Table.Column
           dataIndex="status"
           title="Status"

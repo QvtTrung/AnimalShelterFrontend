@@ -1,7 +1,7 @@
 // PetEdit.tsx
 import { Edit, useForm } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
-import { PetForm } from "../../components/PetForm";
+import { PetForm } from "../../components/Forms/PetForm";
 
 export const PetEdit = () => {
   const { params } = useParsed();

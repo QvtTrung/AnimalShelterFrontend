@@ -1,6 +1,6 @@
 // PetCreate.tsx
 import { Create, useForm } from "@refinedev/antd";
-import { PetForm } from "../../components/PetForm";
+import { PetForm } from "../../components/Forms/PetForm";
 import { message } from "antd";
 import { useApi } from "../../hooks/useApi";
 import { useNavigation } from "@refinedev/core";
@@ -39,11 +39,6 @@ export const PetCreate = () => {
         "data" in response
       ) {
         const formData = new FormData();
-
-        // Debug what's in values.images
-        console.log("values.images:", values.images);
-
-        // Make sure we have actual File objects
         if (values.images && Array.isArray(values.images)) {
           values.images.forEach((file: any) => {
             // Check if it's a File object or has the necessary properties
@@ -63,10 +58,13 @@ export const PetCreate = () => {
         for (let pair of formData.entries()) {
           console.log(pair[0] + ": ", pair[1]);
         }
-        
+
         // Check if FormData has any entries
-        console.log("FormData has entries:", formData.entries().next().done !== true);
-        
+        console.log(
+          "FormData has entries:",
+          formData.entries().next().done !== true
+        );
+
         // Log the FormData object itself
         console.log("FormData object:", formData);
 
@@ -78,7 +76,7 @@ export const PetCreate = () => {
         console.log("Calling uploadImages with:", {
           url: `/pets/${petId}/images`,
           method: "post",
-          values: formData
+          values: formData,
         });
         uploadImages({
           url: `/pets/${petId}/images`,

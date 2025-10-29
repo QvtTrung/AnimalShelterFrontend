@@ -1,7 +1,7 @@
 // AdoptionForm.tsx
 import React from "react";
 import { Form, Select, DatePicker, Button, Input } from "antd";
-import type { IAdoption } from "../interfaces";
+import type { IAdoption } from "../../interfaces";
 
 interface AdoptionFormProps {
   formProps: any;
@@ -14,11 +14,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
 }) => {
   return (
     <Form {...formProps} layout="vertical">
-      <Form.Item
-        label="Pet"
-        name="pet_id"
-        rules={[{ required: true }]}
-      >
+      <Form.Item label="Pet" name="pet_id" rules={[{ required: true }]}>
         <Select
           options={[
             { label: "Dog", value: "dog" },
@@ -27,11 +23,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
           ]}
         />
       </Form.Item>
-      <Form.Item
-        label="User"
-        name="user_id"
-        rules={[{ required: true }]}
-      >
+      <Form.Item label="User" name="user_id" rules={[{ required: true }]}>
         <Select
           options={[
             { label: "User 1", value: "user1" },
@@ -77,10 +69,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       >
         <DatePicker style={{ width: "100%" }} />
       </Form.Item>
-      <Form.Item
-        label="Notes"
-        name="notes"
-      >
+      <Form.Item label="Notes" name="notes">
         <Input.TextArea rows={4} />
       </Form.Item>
       <Form.Item>

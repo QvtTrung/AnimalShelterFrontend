@@ -155,6 +155,7 @@ export const dataProvider: DataProvider = {
       const config: any = {
         method,
         url: requestUrl,
+        headers: {},
       };
 
       // Add query parameters if provided
@@ -175,10 +176,7 @@ export const dataProvider: DataProvider = {
             console.log(pair[0] + ": ", pair[1]);
           }
           config.data = payload;
-          // Let the browser set the Content-Type header for FormData with boundary
-          // Don't set any headers that might interfere with FormData processing
-          // Remove any existing headers that might conflict
-          delete config.headers;
+          delete config.headers["Content-Type"];
         } else {
           config.data = payload;
           // Set Content-Type for JSON payloads

@@ -57,6 +57,10 @@ export interface IReport {
   date_updated?: string;
   user_created?: string;
   user_created_user?: IUser;
+  coordinates?: {
+    type: "Point";
+    coordinates: [number, number]; // [longitude, latitude]
+  };
 }
 
 export interface IRescue {

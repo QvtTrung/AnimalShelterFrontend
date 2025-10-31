@@ -28,14 +28,10 @@ export const ReportList = () => {
       }}
     >
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="title" title="Title" />
-        <Table.Column
-          dataIndex="description"
-          title="Description"
-          ellipsis={true}
-        />
-        <Table.Column dataIndex="species" title="Species" />
-        <Table.Column dataIndex="location" title="Location" />
+        <Table.Column dataIndex="title" title="Title" width={120} />
+        <Table.Column dataIndex="description" title="Description" width={120} />
+        <Table.Column dataIndex="species" title="Species" width={80} />
+        <Table.Column dataIndex="location" title="Location" width={200} />
         <Table.Column
           dataIndex={["user_created_user", "first_name"]}
           title="Reporter"
@@ -48,6 +44,7 @@ export const ReportList = () => {
         <Table.Column
           dataIndex="type"
           title="Type"
+          width={100}
           render={(value) => {
             let color = "default";
             if (value === "abuse") color = "red";
@@ -60,7 +57,8 @@ export const ReportList = () => {
         />
         <Table.Column
           dataIndex="urgency_level"
-          title="Urgency Level"
+          title="Urgency"
+          width={50}
           render={(value) => {
             let color = "default";
             if (value === "critical") color = "red";
@@ -85,12 +83,14 @@ export const ReportList = () => {
         />
         <Table.Column
           dataIndex="date_created"
-          title="Date Created"
+          title="Created"
+          width={80}
           render={(value) => new Date(value).toLocaleDateString()}
         />
         <Table.Column
           title="Actions"
           dataIndex="actions"
+          width={80}
           render={(_, record) => (
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />

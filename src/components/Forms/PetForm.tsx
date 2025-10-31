@@ -34,10 +34,6 @@ export const PetForm: React.FC<PetFormProps> = ({
   const [uploading, setUploading] = useState(false);
   const { useApiCustom, useApiList, useApiMutation } = useApi();
 
-  // Initialize variables for edit mode
-  // let imagesQueryResult = null;
-  // let imageData = null;
-  // let mutationResult: any = { mutate: () => {}, mutation: { status: "idle" } };
   let uploadImages: any = () => {};
   let mutation: any = { status: "idle" };
 
@@ -332,7 +328,12 @@ export const PetForm: React.FC<PetFormProps> = ({
   };
 
   return (
-    <Form {...formProps} onFinish={handleFormFinish} layout="vertical">
+    <Form
+      {...formProps}
+      onFinish={handleFormFinish}
+      layout="vertical"
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <Form.Item label="Name" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>

@@ -25,7 +25,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
@@ -160,16 +159,9 @@ export const authProvider: AuthProvider = {
     const directusUserStr = localStorage.getItem("directusUser");
     const appUserStr = localStorage.getItem("appUser");
 
-    console.log("getIdentity - directusUserStr:", directusUserStr);
-    console.log("getIdentity - appUserStr:", appUserStr);
-
     if (directusUserStr) {
       const directusUser = JSON.parse(directusUserStr);
       const appUser = appUserStr ? JSON.parse(appUserStr) : null;
-
-      console.log("getIdentity - directusUser:", directusUser);
-      console.log("getIdentity - appUser:", appUser);
-
       // Return user identity in the format expected by Refine
       const identity = {
         id: directusUser.id,
@@ -192,7 +184,6 @@ export const authProvider: AuthProvider = {
       return identity;
     }
 
-    console.log("getIdentity - no directus user found, returning null");
     return null;
   },
 

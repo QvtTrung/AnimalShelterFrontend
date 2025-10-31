@@ -13,7 +13,11 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
   saveButtonProps,
 }) => {
   return (
-    <Form {...formProps} layout="vertical">
+    <Form
+      {...formProps}
+      layout="vertical"
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <Form.Item label="Pet" name="pet_id" rules={[{ required: true }]}>
         <Select
           options={[

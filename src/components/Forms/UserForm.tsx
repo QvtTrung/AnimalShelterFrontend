@@ -34,7 +34,12 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
   }, []);
 
   return (
-    <Form {...formProps} layout="vertical" initialValues={userData}>
+    <Form
+      {...formProps}
+      layout="vertical"
+      initialValues={userData}
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <Form.Item
         label="Email"
         name="email"

@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useApi } from "../../hooks/useApi";
+import { LocationPicker } from "../Map/LocationPicker";
 
 interface ReportFormProps {
   formProps: any;
@@ -30,7 +31,54 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   const [fileList, setFileList] = useState<any[]>([]);
   const [existingImages, setExistingImages] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [locText, setLocText] = useState<string>("");
   const { useApiCustom, useApiMutation } = useApi();
+
+  // Handle initial values for edit mode
+  useEffect(() => {
+    if (formProps.initialValues) {
+      // Set location text if available
+      if (formProps.initialValues.location) {
+        setLocText(formProps.initialValues.location);
+      }
+
+      // Set coordinates if available
+      if (formProps.initialValues.coordinates) {
+        const coords: any = formProps.initialValues.coordinates;
+
+        // Convert coordinates to GeoJSON format if needed
+        if (typeof coords === "string" && coords.startsWith("POINT (")) {
+          const match = coords.match(/POINT\s*\(([^\s]+)\s+([^\s]+)\)/);
+          if (match && match.length === 3) {
+            formProps.initialValues.coordinates = {
+              type: "Point",
+              coordinates: [parseFloat(match[1]), parseFloat(match[2])], // [lng, lat]
+            };
+          } else {
+            formProps.initialValues.coordinates = undefined;
+          }
+        }
+        // If coordinates are a JSON string
+        else if (typeof coords === "string") {
+          try {
+            const parsed = JSON.parse(coords);
+            if (
+              parsed &&
+              parsed.type === "Point" &&
+              Array.isArray(parsed.coordinates)
+            ) {
+              formProps.initialValues.coordinates = parsed;
+            } else {
+              formProps.initialValues.coordinates = undefined;
+            }
+          } catch (e) {
+            console.error("Error parsing coordinates JSON:", e);
+            formProps.initialValues.coordinates = undefined;
+          }
+        }
+      }
+    }
+  }, [formProps.initialValues]);
 
   let uploadImages: any = () => {};
   let mutation: any = { status: "idle" };
@@ -45,7 +93,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       }
     );
 
-    const imageData = (imagesQueryResult as any)?.result?.data.data;
+    const imageData = (imagesQueryResult as any)?.result?.data;
 
     const mutationResult = useApiMutation(
       `/reports/${reportId}/images`,
@@ -62,12 +110,30 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             newImages = Array.isArray(data.data) ? data.data : [data.data];
           else if (Array.isArray(data)) newImages = data;
 
-          const processed = newImages.map((img: any) => ({
-            id: img.id || img._id || Date.now().toString(),
-            image_url: img.image_url || img.url || "",
-          }));
+          const processedImages = newImages.map((img: any) => {
+            // If img is a string (URL), convert to object
+            if (typeof img === "string") {
+              return {
+                id: img.split("/").pop() || Date.now().toString(),
+                image_url: img,
+              };
+            }
 
-          setExistingImages((prev) => [...prev, ...processed]);
+            // If img is an object, ensure it has id and image_url
+            return {
+              id:
+                img.id ||
+                img._id ||
+                img.image_url?.split("/").pop() ||
+                Date.now().toString(),
+              image_url: img.image_url || img.url || "",
+            };
+          });
+
+          setExistingImages((prevImages) => [
+            ...prevImages,
+            ...processedImages,
+          ]);
           message.success("Image uploaded successfully");
         },
         onError: (error: any) => {
@@ -81,12 +147,16 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     mutation = mutationResult.mutation;
 
     useEffect(() => {
-      if (imageData && reportId) {
-        // Check if imageData.data.data exists and is an array
-        if (Array.isArray(imageData.data.data)) {
-          setExistingImages(imageData.data.data);
-        }
-      }
+      if (!reportId || !imageData) return;
+
+      console.log("API Response:", imageData);
+
+      const extracted =
+        imageData?.data?.data ||
+        imageData?.data ||
+        (Array.isArray(imageData) ? imageData : []);
+
+      setExistingImages(Array.isArray(extracted) ? extracted : []);
     }, [imageData, reportId]);
   }
 
@@ -154,11 +224,16 @@ export const ReportForm: React.FC<ReportFormProps> = ({
 
   // 🟢 Giống Pet: handleDeleteImage
   const { mutate: deleteImage } = reportId
-    ? useApiMutation(`/reports/:id/images/:imageId`, "delete")
+    ? useApiMutation(`/reports/:id/images/:imageId`, "delete", {
+        // Remove the success and error handlers from here
+        // We'll handle them in the handleDeleteImage function
+      })
     : { mutate: () => {} };
 
   const handleDeleteImage = async (imageId: string) => {
-    if (!reportId) return;
+    if (!reportId) return; // Only allow deletion in edit mode
+
+    console.log("Deleting image with ID:", imageId);
 
     try {
       await new Promise<void>((resolve, reject) => {
@@ -166,18 +241,47 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           {
             url: `/reports/${reportId}/images/${imageId}`,
             method: "delete",
-            values: { id: reportId, imageId },
+            values: { id: reportId, imageId: imageId },
           },
           {
-            onSuccess: () => {
-              setExistingImages((prev) =>
-                prev.filter((img) => img.id !== imageId)
-              );
-              message.success("Image deleted successfully");
+            onSuccess: (data: any, variables: any) => {
+              console.log("Delete response:", data);
+              console.log("Delete variables:", variables);
+
+              // Extract the image ID from variables
+              const deletedImageId =
+                variables?.values?.imageId ||
+                variables?.imageId ||
+                variables?.url?.split("/").pop();
+              console.log("Extracted imageId:", deletedImageId);
+
+              if (deletedImageId) {
+                setExistingImages((prevImages) => {
+                  // Try multiple ways to match the image ID since the structure might vary
+                  const filteredImages = prevImages.filter((img) => {
+                    // Check if img.id exists and matches
+                    if (img.id && img.id === deletedImageId) return false;
+                    // Check if img._id exists and matches
+                    if (img._id && img._id === deletedImageId) return false;
+                    // Check if image_url contains the imageId
+                    if (img.image_url && img.image_url.includes(deletedImageId))
+                      return false;
+                    // If none of the above, keep the image
+                    return true;
+                  });
+                  console.log("Filtered images:", filteredImages);
+                  return filteredImages;
+                });
+                message.success("Image deleted successfully");
+              } else {
+                console.error("Could not extract image ID from response");
+                message.error("Failed to identify deleted image");
+              }
+
               resolve();
             },
             onError: (error: any) => {
-              console.error("Delete failed:", error);
+              console.error("Delete mutation failed:", error);
               message.error("Failed to delete image");
               reject(error);
             },
@@ -186,6 +290,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       });
     } catch (error) {
       console.error("Failed to delete image:", error);
+      // Error is already handled by the mutation's onError callback
     }
   };
 
@@ -206,8 +311,25 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       )
       .filter(Boolean);
 
+    // Get coordinates from form values or use default Hanoi coordinates
+    let coordinates = values.coordinates;
+
+    // If coordinates are undefined, use default Hanoi coordinates
+    if (!coordinates) {
+      coordinates = {
+        type: "Point",
+        coordinates: [105.8542, 21.0285],
+      };
+    }
+
+    // Log coordinates for debugging
+    console.log("Submitting coordinates:", coordinates);
+
     const updatedValues = {
       ...values,
+      // Ensure location is a string
+      location: locText || values.location || "Unknown location",
+      coordinates: coordinates,
       ...(imageFiles.length > 0 && { images: imageFiles }),
     };
 
@@ -217,7 +339,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({
   };
 
   return (
-    <Form {...formProps} onFinish={handleFormFinish} layout="vertical">
+    <Form
+      {...formProps}
+      onFinish={handleFormFinish}
+      layout="vertical"
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <Form.Item label="Title" name="title" rules={[{ required: true }]}>
         <Input placeholder="Enter report title" />
       </Form.Item>
@@ -259,9 +386,18 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           ]}
         />
       </Form.Item>
-
-      <Form.Item label="Location" name="location" rules={[{ required: true }]}>
-        <Input placeholder="Where did it happen?" />
+      <Form.Item name="coordinates" hidden>
+        <Input type="hidden" />
+      </Form.Item>
+      <Form.Item
+        label="Location"
+        name="coordinates"
+        rules={[{ required: true, message: "Please select a location" }]}
+      >
+        <LocationPicker
+          locationText={locText}
+          onLocationTextChange={setLocText}
+        />
       </Form.Item>
 
       <Form.Item label="Report Images">

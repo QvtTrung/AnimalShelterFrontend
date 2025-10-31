@@ -13,7 +13,11 @@ export const RescueForm: React.FC<RescueFormProps> = ({
   saveButtonProps,
 }) => {
   return (
-    <Form {...formProps} layout="vertical">
+    <Form
+      {...formProps}
+      layout="vertical"
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <Form.Item
         label="Title"
         name="title"

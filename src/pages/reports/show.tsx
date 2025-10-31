@@ -7,6 +7,7 @@ import { Show } from "@refinedev/antd";
 import { Typography, Tag, Descriptions, List, Image, Space } from "antd";
 
 import type { IReport } from "../../interfaces";
+import { LocationPicker } from "../../components/Map/LocationPicker";
 
 const { Title, Text } = Typography;
 
@@ -19,7 +20,8 @@ export const ReportShow = () => {
   });
   const { data, isLoading } = queryResult;
   const record = data?.data;
-  const { useApiList, useApiCustom } = useApi();
+  console.log("record:", record);
+  const { useApiList, useApiCustom, useApiOne } = useApi();
 
   // Define expected response type
   interface ReportImagesResponse {
@@ -37,9 +39,15 @@ export const ReportShow = () => {
     {
       queryOptions: {
         enabled: !!record?.id,
+        retry: 1,
+        retryDelay: 1000,
+        onError: (error: any) => {
+          console.error("Error fetching images:", error);
+        },
       },
     }
   );
+  console.log("imagesQueryResult:", imagesQueryResult);
 
   // Extract data with proper typing based on UseCustomReturnType
   // The data is in imagesQueryResult.result.data according to UseCustomReturnType
@@ -50,7 +58,20 @@ export const ReportShow = () => {
   // Extract images from response
   // The imageData.data contains array of images
   console.log("imageData:", imageData);
-  const images = imageData?.data.data || [];
+
+  // Add fallback for when imageData is undefined or has no data
+  let images = [];
+  if (imageData && imageData.data) {
+    // Check if data is directly an array or nested
+    if (Array.isArray(imageData.data)) {
+      images = imageData.data;
+    } else if (imageData.data.data && Array.isArray(imageData.data.data)) {
+      images = imageData.data.data;
+    }
+  }
+
+  // Log for debugging
+  console.log("images:", images);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -133,8 +154,11 @@ export const ReportShow = () => {
         <Descriptions.Item label="Date Updated">
           {record?.date_updated}
         </Descriptions.Item>
+        {/* Coordinates map moved outside of table */}
         <Descriptions.Item label="Images">
-          {images.length > 0 ? (
+          {imagesLoading ? (
+            <span>Loading images...</span>
+          ) : images.length > 0 ? (
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
               dataSource={images}
@@ -161,6 +185,56 @@ export const ReportShow = () => {
           )}
         </Descriptions.Item>
       </Descriptions>
+
+      {/* Coordinates Map */}
+      <div className="mt-5">
+        <Title level={4}>Location on Map</Title>
+        {record?.coordinates ? (
+          <div className="h-96 w-full">
+            <LocationPicker
+              value={(() => {
+                // Convert coordinates to GeoJSON format if needed
+                const coords: any = record.coordinates;
+                if (!coords) return null;
+                
+                // If it's already in GeoJSON format
+                if (typeof coords === 'object' && coords.type === 'Point') {
+                  return coords;
+                }
+                
+                // If it's a string in "POINT (lng lat)" format
+                if (typeof coords === 'string' && coords.startsWith('POINT (')) {
+                  const match = coords.match(/POINT\s*\(([^\s]+)\s+([^\s]+)\)/);
+                  if (match && match.length === 3) {
+                    return {
+                      type: "Point",
+                      coordinates: [parseFloat(match[1]), parseFloat(match[2])] // [lng, lat]
+                    };
+                  }
+                }
+                
+                // If it's a JSON string
+                if (typeof coords === 'string') {
+                  try {
+                    const parsed = JSON.parse(coords);
+                    if (parsed && parsed.type === 'Point') {
+                      return parsed;
+                    }
+                  } catch (e) {
+                    console.error('Error parsing coordinates JSON:', e);
+                  }
+                }
+                
+                return null;
+              })()}
+              locationText={record.location}
+              readOnly={true}
+            />
+          </div>
+        ) : (
+          <span>No coordinates available</span>
+        )}
+      </div>
     </Show>
   );
 };

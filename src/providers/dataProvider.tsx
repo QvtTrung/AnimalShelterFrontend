@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
 // Create and export the data provider
 export const dataProvider: DataProvider = {
   // Method to get a list of resources
-  getList: async ({ resource, pagination, sorters, filters, meta }) => {
+  getList: async ({ resource, pagination, sorters, filters }) => {
     const url = `/${resource}`;
 
     // Build query parameters
@@ -50,29 +50,95 @@ export const dataProvider: DataProvider = {
 
     // Handle pagination
     if (pagination) {
-      const current = (pagination as any).current || 1;
-      const pageSize = (pagination as any).pageSize || 10;
-      params.page = current;
+      const { currentPage, pageSize } = pagination as any;
+      params.page = currentPage;
       params.limit = pageSize;
     }
 
-    // Handle sorting
+    console.log("Pagination params:", params);
+
+    // ✅ Handle sorting for Directus
     if (sorters && sorters.length > 0) {
-      const sort = sorters[0];
-      params.sort = (sort as any).field;
-      params.order = (sort as any).order;
+      const sort = sorters[0] as {
+        field?: string;
+        order?: "asc" | "desc" | string;
+      };
+      if (sort.field) {
+        params.sort =
+          sort.order === "desc" || sort.order === "descend"
+            ? `-${sort.field}` // Directus: prefix '-' means descending
+            : sort.field;
+      }
     }
 
     // Handle filters
     if (filters && filters.length > 0) {
-      filters.forEach((filter) => {
-        if ((filter as any).field && (filter as any).value !== undefined) {
-          params[(filter as any).field] = (filter as any).value;
+      params.filter = {};
+      
+      // Check if we have multiple filters for email, first_name, or last_name
+      const nameFilters = filters.filter((f: any) => 
+        f.field === "email" || f.field === "first_name" || f.field === "last_name"
+      );
+      
+      const otherFilters = filters.filter((f: any) => 
+        f.field !== "email" && f.field !== "first_name" && f.field !== "last_name"
+      );
+      
+      // Handle name filters with OR condition
+      if (nameFilters.length > 0) {
+        const orConditions = nameFilters.map((filter: any) => {
+          const { field, operator, value } = filter;
+          const directusOperator =
+            operator === "contains"
+              ? "_contains"
+              : operator === "eq"
+              ? "_eq"
+              : operator === "ne"
+              ? "_neq"
+              : operator === "gt"
+              ? "_gt"
+              : operator === "lt"
+              ? "_lt"
+              : "_eq";
+          return { [field]: { [directusOperator]: value } };
+        });
+        
+        params.filter = {
+          _or: orConditions,
+        };
+      }
+      
+      // Handle other filters with AND condition
+      otherFilters.forEach((filter) => {
+        const { field, operator, value } = filter as any;
+        if (field && value !== undefined && value !== null) {
+          const directusOperator =
+            operator === "contains"
+              ? "_contains"
+              : operator === "eq"
+              ? "_eq"
+              : operator === "ne"
+              ? "_neq"
+              : operator === "gt"
+              ? "_gt"
+              : operator === "lt"
+              ? "_lt"
+              : "_eq";
+          
+          // If we already have a filter with _or, merge with it
+          if (params.filter._or) {
+            params.filter = {
+              _and: [params.filter, { [field]: { [directusOperator]: value } }]
+            };
+          } else {
+            params.filter[field] = { [directusOperator]: value };
+          }
         }
       });
     }
 
     try {
+      console.log("🔍 Query params sent:", params);
       const response = await axiosInstance.get(url, { params });
 
       return {

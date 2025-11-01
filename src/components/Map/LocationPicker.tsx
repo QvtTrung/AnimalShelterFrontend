@@ -172,7 +172,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       <div className="h-96 w-full overflow-hidden rounded-lg border border-gray-200 relative z-10">
         <MapContainer
           center={position || [21.0285, 105.8542]}
-          zoom={13}
+          zoom={16}
           className="h-full w-full z-10"
           style={{ height: "384px" }}
         >

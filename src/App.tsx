@@ -139,6 +139,13 @@ const App: React.FC = () => {
               disableServerSideValidation: true,
               title: {
                 text: "Animal Shelter",
+                icon: (
+                  <img
+                    src="/icon2.png"
+                    alt="Logo"
+                    className="w-[27px] h[27px]"
+                  />
+                ),
               },
             }}
           >
@@ -204,7 +211,13 @@ const App: React.FC = () => {
                   element={
                     <AuthPage
                       type="login"
-                      title={false}
+                      title={
+                        <img
+                          src="/logo2.png"
+                          alt="Logo"
+                          className="w-[320px] h-[75px]"
+                        />
+                      }
                       registerLink={false}
                       forgotPasswordLink={false}
                       // providers={[
@@ -236,7 +249,7 @@ const App: React.FC = () => {
                     />
                   }
                 />
-                <Route path="/register" element={<RegisterPage />} />
+                {/* <Route path="/register" element={<RegisterPage />} />
                 <Route
                   path="/forgot-password"
                   element={<AuthPage type="forgotPassword" />}
@@ -244,7 +257,7 @@ const App: React.FC = () => {
                 <Route
                   path="/update-password"
                   element={<AuthPage type="updatePassword" />}
-                />
+                /> */}
               </Route>
 
               <Route

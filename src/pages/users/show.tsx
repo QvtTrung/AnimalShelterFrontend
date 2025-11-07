@@ -49,10 +49,14 @@ export const UserShow = () => {
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Date Created">
-          {record?.date_created}
+          {record?.date_created
+            ? new Date(record.date_created).toLocaleString()
+            : "N/A"}
         </Descriptions.Item>
         <Descriptions.Item label="Date Updated">
-          {record?.date_updated}
+          {record?.date_updated
+            ? new Date(record.date_updated).toLocaleString()
+            : "N/A"}
         </Descriptions.Item>
       </Descriptions>
     </Show>

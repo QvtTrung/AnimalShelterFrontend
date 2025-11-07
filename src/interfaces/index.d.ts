@@ -56,10 +56,44 @@ export interface IReport {
   date_created?: string;
   date_updated?: string;
   user_created?: string;
-  user_created_user?: IUser;
   coordinates?: {
     type: "Point";
     coordinates: [number, number]; // [longitude, latitude]
+  };
+}
+
+export interface IRescueParticipant {
+  id: string;
+  rescue_id: string;
+  users_id: string;
+  role: "leader" | "member";
+  date_created?: string;
+  date_updated?: string;
+  user?: {
+    id: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: string;
+  };
+}
+
+export interface IRescueReport {
+  id: string;
+  rescue_id: string;
+  reports_id: string;  // ← Change from `report_id` to `reports_id`
+  status: "success" | "in_progress" | "cancelled";
+  note?: string;
+  date_created?: string;
+  date_updated?: string;
+  report?: {
+    id: string;
+    title: string;
+    status: string;
+    urgency_level: string;
+    location: string;
+    description: string;
+    coordinates?: string | { type: "Point"; coordinates: [number, number] };
   };
 }
 
@@ -71,4 +105,6 @@ export interface IRescue {
   description?: string;
   date_created?: string;
   date_updated?: string;
+  participants?: IRescueParticipant[];
+  reports?: IRescueReport[];
 }

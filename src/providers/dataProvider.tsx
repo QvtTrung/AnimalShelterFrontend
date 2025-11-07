@@ -25,16 +25,67 @@ axiosInstance.interceptors.request.use(
 );
 
 // Add response interceptor to handle common errors
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // If unauthorized, redirect to login
-      localStorage.removeItem("token");
-      localStorage.removeItem("directusUser");
-      localStorage.removeItem("appUser");
-      window.location.href = "/login";
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await axiosInstance.post("/auth/refresh");
+        const { token } = response.data.data;
+
+        if (token) {
+          localStorage.setItem("token", token);
+          axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          processQueue(null, token);
+          return axiosInstance(originalRequest);
+        }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        // If refresh token fails, clear everything and redirect to login
+        localStorage.removeItem("token");
+        localStorage.removeItem("directusUser");
+        localStorage.removeItem("appUser");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(handleApiError(error));
   }
 );
@@ -44,8 +95,6 @@ export const dataProvider: DataProvider = {
   // Method to get a list of resources
   getList: async ({ resource, pagination, sorters, filters }) => {
     const url = `/${resource}`;
-
-    // Build query parameters
     const params: any = {};
 
     // Handle pagination
@@ -55,7 +104,7 @@ export const dataProvider: DataProvider = {
       params.limit = pageSize;
     }
 
-    console.log("Pagination params:", params);
+    // console.log("Pagination params:", params);
 
     // ✅ Handle sorting for Directus
     if (sorters && sorters.length > 0) {
@@ -73,72 +122,57 @@ export const dataProvider: DataProvider = {
 
     // Handle filters
     if (filters && filters.length > 0) {
-      params.filter = {};
-      
-      // Check if we have multiple filters for email, first_name, or last_name
-      const nameFilters = filters.filter((f: any) => 
-        f.field === "email" || f.field === "first_name" || f.field === "last_name"
+      const andFilters: any[] = [];
+
+      // Mapping Refine → Directus operators
+      const opMap: Record<string, string> = {
+        contains: "_contains",
+        eq: "_eq",
+        ne: "_neq",
+        gt: "_gt",
+        lt: "_lt",
+        gte: "_gte", // ← NEW: now supports date range & min/max
+        lte: "_lte", // ← NEW: now supports date range & min/max
+      };
+
+      // 1. Name-search OR (email, first_name, last_name) – keep existing behavior
+      const nameFilters = filters.filter(
+        (f: any) =>
+          f.field === "email" ||
+          f.field === "first_name" ||
+          f.field === "last_name"
       );
-      
-      const otherFilters = filters.filter((f: any) => 
-        f.field !== "email" && f.field !== "first_name" && f.field !== "last_name"
-      );
-      
-      // Handle name filters with OR condition
+
       if (nameFilters.length > 0) {
-        const orConditions = nameFilters.map((filter: any) => {
-          const { field, operator, value } = filter;
-          const directusOperator =
-            operator === "contains"
-              ? "_contains"
-              : operator === "eq"
-              ? "_eq"
-              : operator === "ne"
-              ? "_neq"
-              : operator === "gt"
-              ? "_gt"
-              : operator === "lt"
-              ? "_lt"
-              : "_eq";
-          return { [field]: { [directusOperator]: value } };
+        const orConditions = nameFilters.map((f: any) => {
+          const directusOp = opMap[f.operator] ?? "_eq";
+          return { [f.field]: { [directusOp]: f.value } };
         });
-        
-        params.filter = {
-          _or: orConditions,
-        };
+        andFilters.push({ _or: orConditions });
       }
-      
-      // Handle other filters with AND condition
-      otherFilters.forEach((filter) => {
-        const { field, operator, value } = filter as any;
-        if (field && value !== undefined && value !== null) {
-          const directusOperator =
-            operator === "contains"
-              ? "_contains"
-              : operator === "eq"
-              ? "_eq"
-              : operator === "ne"
-              ? "_neq"
-              : operator === "gt"
-              ? "_gt"
-              : operator === "lt"
-              ? "_lt"
-              : "_eq";
-          
-          // If we already have a filter with _or, merge with it
-          if (params.filter._or) {
-            params.filter = {
-              _and: [params.filter, { [field]: { [directusOperator]: value } }]
-            };
-          } else {
-            params.filter[field] = { [directusOperator]: value };
-          }
-        }
+
+      // 2. All other filters (status, title, date_created, required_participants, etc.)
+      const otherFilters = filters.filter(
+        (f: any) => !["email", "first_name", "last_name"].includes(f.field)
+      );
+
+      otherFilters.forEach((f: any) => {
+        if (f.value === undefined || f.value === null) return;
+        const directusOp = opMap[f.operator] ?? "_eq";
+        andFilters.push({ [f.field]: { [directusOp]: f.value } });
       });
+
+      // 3. Build final filter object
+      if (andFilters.length === 1) {
+        params.filter = andFilters[0];
+      } else if (andFilters.length > 1) {
+        params.filter = { _and: andFilters };
+      }
+      // (if empty → no filter param)
     }
 
     try {
-      console.log("🔍 Query params sent:", params);
+      // console.log("🔍 Query params sent:", params);
       const response = await axiosInstance.get(url, { params });
 
       return {

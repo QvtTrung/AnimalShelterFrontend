@@ -220,57 +220,18 @@ export const UserList: React.FC = () => {
           title="Email"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
-          filterDropdown={(props) => (
-            <FilterDropdown {...props}>
-              <Input
-                placeholder="Search email"
-                value={props.selectedKeys[0]}
-                onChange={(e) =>
-                  props.setSelectedKeys(e.target.value ? [e.target.value] : [])
-                }
-                onPressEnter={() => props.confirm()}
-                style={{ width: 188, marginBottom: 8, display: "block" }}
-              />
-            </FilterDropdown>
-          )}
         />
         <Table.Column<IUser>
           dataIndex="first_name"
           title="First Name"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
-          filterDropdown={(props) => (
-            <FilterDropdown {...props}>
-              <Input
-                placeholder="Search first name"
-                value={props.selectedKeys[0]}
-                onChange={(e) =>
-                  props.setSelectedKeys(e.target.value ? [e.target.value] : [])
-                }
-                onPressEnter={() => props.confirm()}
-                style={{ width: 188, marginBottom: 8, display: "block" }}
-              />
-            </FilterDropdown>
-          )}
         />
         <Table.Column<IUser>
           dataIndex="last_name"
           title="Last Name"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
-          filterDropdown={(props) => (
-            <FilterDropdown {...props}>
-              <Input
-                placeholder="Search last name"
-                value={props.selectedKeys[0]}
-                onChange={(e) =>
-                  props.setSelectedKeys(e.target.value ? [e.target.value] : [])
-                }
-                onPressEnter={() => props.confirm()}
-                style={{ width: 188, marginBottom: 8, display: "block" }}
-              />
-            </FilterDropdown>
-          )}
         />
         <Table.Column<IUser>
           dataIndex="phone_number"
@@ -284,25 +245,6 @@ export const UserList: React.FC = () => {
             // If role is available, display it
             return value || "Not assigned";
           }}
-          filterDropdown={(props) => (
-            <FilterDropdown {...props}>
-              <Select
-                style={{ width: 200 }}
-                placeholder="Select role"
-                allowClear
-                options={[
-                  { value: "Administrator", label: "Administrator" },
-                  { value: "Staff", label: "Staff" },
-                  { value: "User", label: "User" },
-                ]}
-                onChange={(value) => {
-                  props.setSelectedKeys(value ? [value] : []);
-                  props.confirm();
-                }}
-                value={props.selectedKeys[0]}
-              />
-            </FilterDropdown>
-          )}
         />
         <Table.Column<IUser>
           dataIndex="status"
@@ -314,24 +256,6 @@ export const UserList: React.FC = () => {
 
             return <Tag color={color}>{value}</Tag>;
           }}
-          filterDropdown={(props) => (
-            <FilterDropdown {...props}>
-              <Select
-                style={{ width: 200 }}
-                placeholder="Select status"
-                allowClear
-                options={[
-                  { value: "active", label: "Active" },
-                  { value: "inactive", label: "Inactive" },
-                ]}
-                onChange={(value) => {
-                  props.setSelectedKeys(value ? [value] : []);
-                  props.confirm();
-                }}
-                value={props.selectedKeys[0]}
-              />
-            </FilterDropdown>
-          )}
         />
         <Table.Column<IUser>
           title="Actions"

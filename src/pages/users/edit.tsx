@@ -9,7 +9,7 @@ export const UserEdit = () => {
   const id = params?.id as string;
 
   return (
-    <Edit saveButtonProps={{ style: { display: "none" } }}>
+    <Edit saveButtonProps={{ hidden: true }}>
       <UserForm id={id} onSuccess={() => list("users")} />
     </Edit>
   );

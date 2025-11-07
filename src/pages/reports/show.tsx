@@ -12,16 +12,25 @@ import { LocationPicker } from "../../components/Map/LocationPicker";
 const { Title, Text } = Typography;
 
 export const ReportShow = () => {
-  const { query: queryResult } = useShow<IReport>({
-    meta: {
-      select:
-        "*, user_created_user.first_name, user_created_user.last_name, user_created_user.email",
-    },
-  });
+  const { query: queryResult } = useShow<IReport>();
   const { data, isLoading } = queryResult;
   const record = data?.data;
+  console.log("data:", data);
   console.log("record:", record);
   const { useApiList, useApiCustom, useApiOne } = useApi();
+
+  // Fetch reporter information using useApiCustom with getUserByDirectusId route
+  const { query: reporterQuery } = useApiCustom(
+    `/users/directus/${record?.user_created}`,
+    "get",
+    {
+      queryOptions: {
+        enabled: !!record?.user_created,
+      },
+    }
+  );
+  const reporter = reporterQuery?.data?.data?.data;
+  console.log("reporter:", reporter);
 
   // Define expected response type
   interface ReportImagesResponse {
@@ -47,7 +56,6 @@ export const ReportShow = () => {
       },
     }
   );
-  console.log("imagesQueryResult:", imagesQueryResult);
 
   // Extract data with proper typing based on UseCustomReturnType
   // The data is in imagesQueryResult.result.data according to UseCustomReturnType
@@ -57,7 +65,6 @@ export const ReportShow = () => {
 
   // Extract images from response
   // The imageData.data contains array of images
-  console.log("imageData:", imageData);
 
   // Add fallback for when imageData is undefined or has no data
   let images = [];
@@ -71,7 +78,6 @@ export const ReportShow = () => {
   }
 
   // Log for debugging
-  console.log("images:", images);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -137,11 +143,10 @@ export const ReportShow = () => {
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Reporter">
-          {record?.user_created_user?.first_name}{" "}
-          {record?.user_created_user?.last_name}
+          {reporter?.first_name || "Loading..."} {reporter?.last_name || ""}
         </Descriptions.Item>
         <Descriptions.Item label="Reporter Email">
-          {record?.user_created_user?.email}
+          {reporter?.email || "Loading..."}
         </Descriptions.Item>
         <Descriptions.Item label="Status">
           <Tag color={getStatusColor(record?.status || "")}>
@@ -149,10 +154,14 @@ export const ReportShow = () => {
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Date Created">
-          {record?.date_created}
+          {record?.date_created
+            ? new Date(record.date_created).toLocaleString()
+            : "N/A"}
         </Descriptions.Item>
         <Descriptions.Item label="Date Updated">
-          {record?.date_updated}
+          {record?.date_updated
+            ? new Date(record.date_updated).toLocaleString()
+            : "N/A"}
         </Descriptions.Item>
         {/* Coordinates map moved outside of table */}
         <Descriptions.Item label="Images">
@@ -196,35 +205,38 @@ export const ReportShow = () => {
                 // Convert coordinates to GeoJSON format if needed
                 const coords: any = record.coordinates;
                 if (!coords) return null;
-                
+
                 // If it's already in GeoJSON format
-                if (typeof coords === 'object' && coords.type === 'Point') {
+                if (typeof coords === "object" && coords.type === "Point") {
                   return coords;
                 }
-                
+
                 // If it's a string in "POINT (lng lat)" format
-                if (typeof coords === 'string' && coords.startsWith('POINT (')) {
+                if (
+                  typeof coords === "string" &&
+                  coords.startsWith("POINT (")
+                ) {
                   const match = coords.match(/POINT\s*\(([^\s]+)\s+([^\s]+)\)/);
                   if (match && match.length === 3) {
                     return {
                       type: "Point",
-                      coordinates: [parseFloat(match[1]), parseFloat(match[2])] // [lng, lat]
+                      coordinates: [parseFloat(match[1]), parseFloat(match[2])], // [lng, lat]
                     };
                   }
                 }
-                
+
                 // If it's a JSON string
-                if (typeof coords === 'string') {
+                if (typeof coords === "string") {
                   try {
                     const parsed = JSON.parse(coords);
-                    if (parsed && parsed.type === 'Point') {
+                    if (parsed && parsed.type === "Point") {
                       return parsed;
                     }
                   } catch (e) {
-                    console.error('Error parsing coordinates JSON:', e);
+                    console.error("Error parsing coordinates JSON:", e);
                   }
                 }
-                
+
                 return null;
               })()}
               locationText={record.location}

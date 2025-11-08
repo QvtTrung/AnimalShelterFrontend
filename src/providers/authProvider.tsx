@@ -1,5 +1,6 @@
 import { type AuthProvider } from "@refinedev/core";
 import axios from "axios";
+import { initTokenManager, cleanupTokenManager } from "../utils/tokenManager";
 
 // Define the API base URL from environment variables
 const API_URL = import.meta.env.VITE_API_URL;
@@ -34,10 +35,15 @@ export const authProvider: AuthProvider = {
       });
 
       // Store the token and user data
-      const { directusUser, user, token } = response.data.data;
+      const { directusUser, user, token, refresh_token } = response.data.data;
 
       if (token) {
         localStorage.setItem("token", token);
+      }
+
+      // Store refresh token if provided (optional, as it may be in HTTP-only cookie)
+      if (refresh_token) {
+        localStorage.setItem("refresh_token", refresh_token);
       }
 
       // Store directus user data for authentication
@@ -49,6 +55,9 @@ export const authProvider: AuthProvider = {
       if (user) {
         localStorage.setItem("appUser", JSON.stringify(user));
       }
+
+      // Start automatic token refresh
+      initTokenManager();
 
       return {
         success: true,
@@ -75,10 +84,15 @@ export const authProvider: AuthProvider = {
       });
 
       // Store the token and user data
-      const { directusUser, user, token } = response.data.data;
+      const { directusUser, user, token, refresh_token } = response.data.data;
 
       if (token) {
         localStorage.setItem("token", token);
+      }
+
+      // Store refresh token if provided (optional, as it may be in HTTP-only cookie)
+      if (refresh_token) {
+        localStorage.setItem("refresh_token", refresh_token);
       }
 
       // Store directus user data for authentication
@@ -90,6 +104,9 @@ export const authProvider: AuthProvider = {
       if (user) {
         localStorage.setItem("appUser", JSON.stringify(user));
       }
+
+      // Start automatic token refresh
+      initTokenManager();
 
       return {
         success: true,
@@ -114,8 +131,12 @@ export const authProvider: AuthProvider = {
       console.error("Logout API call failed:", error);
     }
 
+    // Stop automatic token refresh
+    cleanupTokenManager();
+
     // Clear local storage
     localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("directusUser");
     localStorage.removeItem("appUser");
 
@@ -129,9 +150,73 @@ export const authProvider: AuthProvider = {
     const token = localStorage.getItem("token");
 
     if (token) {
-      return {
-        authenticated: true,
-      };
+      // Optionally: verify token validity by making a request to /auth/me
+      // This ensures the token is still valid on the backend
+      try {
+        await axiosInstance.get("/auth/me");
+        return {
+          authenticated: true,
+        };
+      } catch (error: any) {
+        // If the token is invalid and refresh fails, the interceptor will handle it
+        if (error?.response?.status === 401) {
+          // Try to refresh the token one more time
+          try {
+            const response = await axiosInstance.post("/auth/refresh");
+            const {
+              directusUser,
+              user,
+              token: newToken,
+              refresh_token,
+            } = response.data.data;
+
+            if (newToken) {
+              localStorage.setItem("token", newToken);
+
+              // Store refresh token if provided
+              if (refresh_token) {
+                localStorage.setItem("refresh_token", refresh_token);
+              }
+
+              if (directusUser) {
+                localStorage.setItem(
+                  "directusUser",
+                  JSON.stringify(directusUser)
+                );
+              }
+
+              if (user) {
+                localStorage.setItem("appUser", JSON.stringify(user));
+              }
+
+              return {
+                authenticated: true,
+              };
+            }
+          } catch (refreshError) {
+            console.error("Token refresh failed in check:", refreshError);
+            // Clear storage and redirect to login
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("directusUser");
+            localStorage.removeItem("appUser");
+
+            return {
+              authenticated: false,
+              error: {
+                name: "Session expired",
+                message: "Your session has expired. Please login again.",
+              },
+              logout: true,
+              redirectTo: "/login",
+            };
+          }
+        }
+
+        return {
+          authenticated: true,
+        };
+      }
     }
 
     return {
@@ -146,10 +231,41 @@ export const authProvider: AuthProvider = {
   },
 
   onError: async (error: any) => {
+    // Handle 401 errors by attempting token refresh
     if (error?.response?.status === 401) {
-      return {
-        logout: true,
-      };
+      try {
+        // Try to refresh the token
+        const response = await axiosInstance.post("/auth/refresh");
+        const { directusUser, user, token, refresh_token } = response.data.data;
+
+        if (token) {
+          // Update stored token and user data
+          localStorage.setItem("token", token);
+
+          // Store refresh token if provided
+          if (refresh_token) {
+            localStorage.setItem("refresh_token", refresh_token);
+          }
+
+          if (directusUser) {
+            localStorage.setItem("directusUser", JSON.stringify(directusUser));
+          }
+
+          if (user) {
+            localStorage.setItem("appUser", JSON.stringify(user));
+          }
+
+          // Return success - don't logout
+          return { error };
+        }
+      } catch (refreshError) {
+        console.error("Token refresh failed in onError:", refreshError);
+        // If refresh fails, force logout
+        return {
+          logout: true,
+          redirectTo: "/login",
+        };
+      }
     }
 
     return { error };

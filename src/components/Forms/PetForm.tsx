@@ -339,7 +339,13 @@ export const PetForm: React.FC<PetFormProps> = ({
       </Form.Item>
 
       <Form.Item label="Species" name="species" rules={[{ required: true }]}>
-        <Input />
+        <Select
+          options={[
+            { label: "Dog", value: "dog" },
+            { label: "Cat", value: "cat" },
+            { label: "Other", value: "other" },
+          ]}
+        />
       </Form.Item>
 
       <Form.Item label="Description" name="description">

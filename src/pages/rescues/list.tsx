@@ -342,7 +342,7 @@ export const RescueList = () => {
             const requiredCount = value || 0;
             return (
               <Badge
-                count={participantsCount}
+                count={`${participantsCount}/${requiredCount}`}
                 style={{
                   backgroundColor:
                     participantsCount >= requiredCount ? "#52c41a" : "#faad14",

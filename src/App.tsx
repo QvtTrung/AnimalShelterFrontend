@@ -57,8 +57,18 @@ import { ThemedHeader } from "./components/layout/header";
 import { ThemedLayout } from "./components/layout";
 import { ThemedSider } from "./components/layout/sider";
 import { ThemedTitle } from "./components/layout/title";
+import { useEffect } from "react";
+import { initTokenManager } from "./utils/tokenManager";
 
 const App: React.FC = () => {
+  // Initialize token manager on app load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      initTokenManager();
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <ConfigProvider theme={RefineThemes.Blue}>

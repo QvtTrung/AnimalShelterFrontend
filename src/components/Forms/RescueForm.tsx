@@ -135,6 +135,12 @@ export const RescueForm: React.FC<RescueFormProps> = ({
     if (participants.some((p) => p.users_id === selectedUserId))
       return message.error("User is already a participant");
 
+    // Check if there are already enough participants
+    const requiredParticipants = formProps?.form?.getFieldValue('required_participants');
+    if (requiredParticipants && participants.length >= requiredParticipants) {
+      return message.error(`Cannot add more participants. Maximum required participants (${requiredParticipants}) already reached.`);
+    }
+
     const role = selectedUserRoles[selectedUserId] || "member";
     const rescueId = initialValues?.id;
 
@@ -344,6 +350,9 @@ export const RescueForm: React.FC<RescueFormProps> = ({
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setIsUserModalVisible(true)}
+            disabled={formProps?.form?.getFieldValue('required_participants') ? 
+                      participants.length >= formProps.form.getFieldValue('required_participants') : 
+                      false}
           >
             Add Participant
           </Button>

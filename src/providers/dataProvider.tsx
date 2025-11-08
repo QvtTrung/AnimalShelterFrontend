@@ -45,7 +45,9 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 401 errors (unauthorized) with token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // If already refreshing, queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -63,23 +65,56 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Attempt to refresh the token
         const response = await axiosInstance.post("/auth/refresh");
-        const { token } = response.data.data;
+        const { directusUser, user, token, refresh_token } = response.data.data;
 
         if (token) {
+          // Update stored token and user data
           localStorage.setItem("token", token);
+
+          // Store refresh token if provided
+          if (refresh_token) {
+            localStorage.setItem("refresh_token", refresh_token);
+          }
+
+          if (directusUser) {
+            localStorage.setItem("directusUser", JSON.stringify(directusUser));
+          }
+
+          if (user) {
+            localStorage.setItem("appUser", JSON.stringify(user));
+          }
+
+          // Update axios instance default header
           axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+          // Update the failed request header
           originalRequest.headers.Authorization = `Bearer ${token}`;
+
+          // Process queued requests with new token
           processQueue(null, token);
+
+          // Retry the original request
           return axiosInstance(originalRequest);
+        } else {
+          throw new Error("No token received from refresh endpoint");
         }
       } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+
+        // Reject all queued requests
         processQueue(refreshError, null);
-        // If refresh token fails, clear everything and redirect to login
+
+        // Clear authentication data
         localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
         localStorage.removeItem("directusUser");
         localStorage.removeItem("appUser");
+
+        // Redirect to login page
         window.location.href = "/login";
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

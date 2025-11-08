@@ -51,7 +51,6 @@ export const RescueEdit = () => {
     <Edit saveButtonProps={{ hidden: true }}>
       <RescueForm
         formProps={formProps}
-        saveButtonProps={saveButtonProps}
         initialValues={rescueData}
       />
     </Edit>

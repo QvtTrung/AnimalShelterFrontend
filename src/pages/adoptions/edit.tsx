@@ -12,7 +12,7 @@ export const AdoptionEdit = () => {
   });
 
   return (
-    <Edit>
+    <Edit saveButtonProps={{ hidden: true }}>
       <AdoptionForm formProps={formProps} saveButtonProps={saveButtonProps} />
     </Edit>
   );

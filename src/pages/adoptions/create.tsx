@@ -6,7 +6,7 @@ export const AdoptionCreate = () => {
   const { formProps, saveButtonProps } = useForm();
 
   return (
-    <Create>
+    <Create saveButtonProps={{ hidden: true }}>
       <AdoptionForm formProps={formProps} saveButtonProps={saveButtonProps} />
     </Create>
   );

@@ -33,15 +33,18 @@ export interface IUser {
 
 export interface IAdoption {
   id: string;
-  status: "planned" | "in_progress" | "completed" | "cancelled";
-  pet_id?: string;
-  user_id?: string;
+  status: "pending" | "confirming" | "confirmed" | "completed" | "cancelled";
+  pet_id?: string | IPet;  // Can be ID string or populated pet object
+  user_id?: string | IUser;  // Can be ID string or populated user object
   approval_date?: string;
+  appointment_date?: string;
   notes?: string;
   date_created?: string;
   date_updated?: string;
-  pets?: IPet;
-  user?: IUser;
+  confirmation_sent_at?: string;
+  confirmation_expires_at?: string;
+  pets?: IPet;  // Legacy field name for backwards compatibility
+  user?: IUser;  // Legacy field name for backwards compatibility
 }
 
 export interface IReport {

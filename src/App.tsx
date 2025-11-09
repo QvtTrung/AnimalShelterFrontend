@@ -37,6 +37,8 @@ import {
   AdoptionEdit,
   AdoptionShow,
   AdoptionCreate,
+  AdoptionConfirm,
+  AdoptionCancel,
 } from "../src/pages/adoptions";
 import {
   ReportList,
@@ -268,6 +270,12 @@ const App: React.FC = () => {
                   path="/update-password"
                   element={<AuthPage type="updatePassword" />}
                 /> */}
+              </Route>
+
+              {/* Public routes for adoption confirmation/cancellation */}
+              <Route path="/adoptions">
+                <Route path="confirm/:id" element={<AdoptionConfirm />} />
+                <Route path="cancel/:id" element={<AdoptionCancel />} />
               </Route>
 
               <Route

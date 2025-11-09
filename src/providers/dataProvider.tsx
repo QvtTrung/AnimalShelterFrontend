@@ -128,15 +128,34 @@ axiosInstance.interceptors.response.use(
 // Create and export the data provider
 export const dataProvider: DataProvider = {
   // Method to get a list of resources
-  getList: async ({ resource, pagination, sorters, filters }) => {
+  getList: async ({ resource, pagination, sorters, filters, meta }) => {
     const url = `/${resource}`;
     const params: any = {};
 
-    // Handle pagination
-    if (pagination) {
-      const { currentPage, pageSize } = pagination as any;
+    // Handle pagination - check if pagination mode is "off"
+    if (pagination && pagination.mode !== "off") {
+      // Refine can pass either 'current' or 'currentPage' depending on version
+      const currentPage =
+        (pagination as any).current || (pagination as any).currentPage || 1;
+      const pageSize = (pagination as any).pageSize || 10;
       params.page = currentPage;
       params.limit = pageSize;
+      console.log(`Pagination for ${resource}:`, {
+        currentPage,
+        pageSize,
+        mode: pagination.mode,
+      });
+    } else if (pagination?.mode === "off") {
+      // When pagination is off, set a high limit to get all records
+      params.limit = -1; // Directus uses -1 to fetch all records
+      console.log(`Pagination OFF for ${resource} - fetching all records`);
+    }
+
+    // Handle meta fields for nested data fetching
+    if (meta?.fields) {
+      params.fields = Array.isArray(meta.fields)
+        ? meta.fields.join(",")
+        : meta.fields;
     }
 
     // console.log("Pagination params:", params);
@@ -225,7 +244,18 @@ export const dataProvider: DataProvider = {
   // Method to get a single resource by ID
   getOne: async ({ resource, id, meta }) => {
     try {
-      const response = await axiosInstance.get(`/${resource}/${id}`);
+      const params: any = {};
+
+      // Handle meta fields for nested data fetching
+      if (meta?.fields) {
+        params.fields = Array.isArray(meta.fields)
+          ? meta.fields.join(",")
+          : meta.fields;
+      }
+
+      const response = await axiosInstance.get(`/${resource}/${id}`, {
+        params,
+      });
 
       return {
         data: response.data.data,

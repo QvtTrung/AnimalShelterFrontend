@@ -1,6 +1,11 @@
 // src/pages/rescue/show.tsx
 import React, { useState, useEffect, useMemo } from "react";
-import { useShow, useNavigation, useMany } from "@refinedev/core";
+import {
+  useShow,
+  useNavigation,
+  useMany,
+  useCustomMutation,
+} from "@refinedev/core";
 import { Show } from "@refinedev/antd";
 import {
   Typography,
@@ -13,14 +18,21 @@ import {
   List,
   Avatar,
   Button,
+  Modal,
+  Input,
+  message,
 } from "antd";
 import {
   TeamOutlined,
   FileTextOutlined,
   UserOutlined,
+  PlayCircleOutlined,
+  StopOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import type { IRescue } from "../../interfaces";
 import { RescueMap } from "../../components/Map/RescueMap";
+import { RescueProgressTracker } from "../../components/RescueProgressTracker";
 
 const { Title, Text } = Typography;
 
@@ -30,6 +42,17 @@ export const RescueShow = () => {
   const { data, isLoading } = queryResult;
   const record = data?.data;
   const { show } = useNavigation();
+
+  const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+  const [isStartModalVisible, setIsStartModalVisible] = useState(false);
+  const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Mutations for workflow actions
+  const { mutate: startRescue } = useCustomMutation();
+  const { mutate: cancelRescue } = useCustomMutation();
+  const { mutate: completeRescue } = useCustomMutation();
 
   // Map center and zoom are now handled in the RescueMap component
 
@@ -81,11 +104,110 @@ export const RescueShow = () => {
     }
   };
 
+  const getReportStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "orange";
+      case "assigned":
+        return "blue";
+      case "resolved":
+        return "green";
+      default:
+        return "default";
+    }
+  };
+
   const getReportDetails = (reportId: string) =>
     reportData.find((r) => r.id === reportId);
 
   const getUserDetails = (userId: string) =>
     userData?.find((u: any) => (u.id ?? u._id) === userId);
+
+  /* ----------------------- Workflow Actions ------------------------------- */
+  const handleStartRescue = () => {
+    setLoading(true);
+    startRescue(
+      {
+        url: `/rescues/${record?.id}/start`,
+        method: "post",
+        values: {},
+      },
+      {
+        onSuccess: () => {
+          message.success("Rescue campaign started successfully!");
+          queryResult.refetch();
+          setIsStartModalVisible(false);
+          setLoading(false);
+        },
+        onError: (error: any) => {
+          message.error(error?.message || "Failed to start rescue");
+          setLoading(false);
+        },
+      }
+    );
+  };
+
+  const handleCancelRescue = () => {
+    setLoading(true);
+    cancelRescue(
+      {
+        url: `/rescues/${record?.id}/cancel`,
+        method: "post",
+        values: { reason: cancelReason },
+      },
+      {
+        onSuccess: () => {
+          message.success("Rescue cancelled successfully!");
+          queryResult.refetch();
+          setIsCancelModalVisible(false);
+          setCancelReason("");
+          setLoading(false);
+        },
+        onError: (error: any) => {
+          message.error(error?.message || "Failed to cancel rescue");
+          setLoading(false);
+        },
+      }
+    );
+  };
+
+  const handleCompleteRescue = () => {
+    setLoading(true);
+    completeRescue(
+      {
+        url: `/rescues/${record?.id}/complete`,
+        method: "post",
+        values: {},
+      },
+      {
+        onSuccess: () => {
+          message.success(
+            "Rescue completed successfully! Reports have been updated."
+          );
+          queryResult.refetch();
+          setIsCompleteModalVisible(false);
+          setLoading(false);
+        },
+        onError: (error: any) => {
+          message.error(error?.message || "Failed to complete rescue");
+          setLoading(false);
+        },
+      }
+    );
+  };
+
+  const showStartConfirmation = () => {
+    setIsStartModalVisible(true);
+  };
+
+  const showCompleteConfirmation = () => {
+    setIsCompleteModalVisible(true);
+  };
+
+  // Helper function to refetch after progress update
+  const handleProgressUpdate = () => {
+    queryResult.refetch();
+  };
 
   /* ----------------------------------------------------------------------- */
   return (
@@ -106,7 +228,7 @@ export const RescueShow = () => {
             <Card
               title={
                 <Space>
-                  <FileTextOutlined />
+                  <FileTextOutlined className="text-blue-500" />
                   <Title level={4} className="!m-0">
                     Rescue Information
                   </Title>
@@ -114,6 +236,11 @@ export const RescueShow = () => {
               }
               variant="outlined"
               className="h-[550px] rounded-2xl shadow-lg border border-gray-200 bg-white overflow-y-scroll"
+              headStyle={{
+                background: "#f8f9fa",
+                color: "#333",
+                borderBottom: "2px solid #e0e0e0",
+              }}
             >
               <div className="px-2 sm:px-3 overflow-y-auto h-full">
                 <Space direction="vertical" className="w-full">
@@ -135,12 +262,93 @@ export const RescueShow = () => {
                   </Text>
 
                   <Text>
-                    <strong>Created:</strong> {record?.date_created ? new Date(record.date_created).toLocaleString() : 'N/A'}
+                    <strong>Created:</strong>{" "}
+                    {record?.date_created
+                      ? new Date(record.date_created).toLocaleString()
+                      : "N/A"}
                   </Text>
 
                   <Text>
-                    <strong>Last Updated:</strong> {record?.date_updated ? new Date(record.date_updated).toLocaleString() : 'N/A'}
+                    <strong>Last Updated:</strong>{" "}
+                    {record?.date_updated
+                      ? new Date(record.date_updated).toLocaleString()
+                      : "N/A"}
                   </Text>
+
+                  <Divider className="my-3" />
+
+                  {/* ----------------------- ACTION BUTTONS / STATUS INFO ---------------------- */}
+                  <div className="space-y-2">
+                    {record?.status === "planned" && (
+                      <>
+                        <Button
+                          type="primary"
+                          icon={<PlayCircleOutlined />}
+                          onClick={showStartConfirmation}
+                          loading={loading}
+                          block
+                          size="large"
+                        >
+                          Start Rescue Campaign
+                        </Button>
+                        <Button
+                          danger
+                          icon={<StopOutlined />}
+                          onClick={() => setIsCancelModalVisible(true)}
+                          loading={loading}
+                          block
+                          size="large"
+                        >
+                          Cancel Rescue
+                        </Button>
+                      </>
+                    )}
+
+                    {record?.status === "in_progress" && (
+                      <Button
+                        type="primary"
+                        icon={<CheckCircleOutlined />}
+                        onClick={showCompleteConfirmation}
+                        loading={loading}
+                        block
+                        size="large"
+                      >
+                        Complete Rescue
+                      </Button>
+                    )}
+
+                    {record?.status === "completed" && (
+                      <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
+                        <CheckCircleOutlined className="text-4xl text-green-600 mb-2" />
+                        <Title level={5} className="!mb-1 text-gray-800">
+                          Rescue Completed
+                        </Title>
+                        <Text className="text-gray-700">
+                          This rescue campaign has been completed
+                        </Text>
+                      </div>
+                    )}
+
+                    {record?.status === "cancelled" && (
+                      <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
+                        <StopOutlined className="text-4xl text-red-600 mb-2" />
+                        <Title level={5} className="!mb-1 text-gray-800">
+                          Rescue Cancelled
+                        </Title>
+                        <Text className="text-gray-700">
+                          This rescue campaign has been cancelled
+                        </Text>
+                        {record?.cancellation_reason && (
+                          <div className="mt-2 pt-2 border-t border-gray-300">
+                            <Text className="text-sm text-gray-600">
+                              <strong>Reason:</strong>{" "}
+                              {record.cancellation_reason}
+                            </Text>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   <Divider className="my-3" />
 
@@ -175,7 +383,9 @@ export const RescueShow = () => {
                               avatar={
                                 <Avatar
                                   className={`${
-                                    report.urgency_level === "high"
+                                    report.urgency_level === "critical"
+                                      ? "bg-red-600"
+                                      : report.urgency_level === "high"
                                       ? "bg-red-500"
                                       : report.urgency_level === "medium"
                                       ? "bg-amber-500"
@@ -188,7 +398,9 @@ export const RescueShow = () => {
                                 <Space className="flex flex-wrap">
                                   <Text strong>{report.title}</Text>
                                   <Tag
-                                    color={getStatusColor(report.status ?? "")}
+                                    color={getReportStatusColor(
+                                      report.status ?? ""
+                                    )}
                                   >
                                     {report.status}
                                   </Tag>
@@ -214,16 +426,16 @@ export const RescueShow = () => {
         </Row>
 
         {/* ----------------------- PARTICIPANTS ------------------------------ */}
-        <Row gutter={[16, 16]}>
+        <Row gutter={[16, 16]} className="mt-6" style={{ marginTop: "24px" }}>
           <Col span={24}>
             <Card
               title={
                 <Space>
-                  <TeamOutlined />
+                  <TeamOutlined className="text-purple-500" />
                   <Title level={4} className="!m-0">
                     Participants
                   </Title>
-                  <Tag color="blue">
+                  <Tag color="blue" className="text-base px-3 py-1">
                     {record?.participants?.length ?? 0} /{" "}
                     {record?.required_participants}
                   </Tag>
@@ -231,6 +443,11 @@ export const RescueShow = () => {
               }
               variant="outlined"
               className="rounded-2xl shadow-lg border border-gray-200 bg-white overflow-hidden"
+              headStyle={{
+                background: "#f8f9fa",
+                color: "#333",
+                borderBottom: "2px solid #e0e0e0",
+              }}
             >
               <List
                 grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
@@ -241,14 +458,15 @@ export const RescueShow = () => {
                     <List.Item>
                       <Card
                         hoverable
-                        className="text-center cursor-pointer pt-[10px]!"
+                        className="text-center cursor-pointer pt-[10px] shadow-md hover:shadow-lg transition-shadow border border-gray-200"
                         onClick={() => show("users", item.users_id)}
                         cover={
-                          <div className="bg-gray-50 flex justify-center">
+                          <div className="bg-gray-50 flex justify-center py-4">
                             <Avatar
-                              size={55}
+                              size={64}
                               src={user?.avatar}
                               icon={<UserOutlined />}
+                              className="shadow-lg"
                             />
                           </div>
                         }
@@ -277,7 +495,113 @@ export const RescueShow = () => {
             </Card>
           </Col>
         </Row>
+
+        {/* ----------------------- PROGRESS TRACKER -------------------------- */}
+        {record?.status === "in_progress" && (
+          <Row gutter={[16, 16]} className="mt-6" style={{ marginTop: "24px" }}>
+            <Col span={24}>
+              <RescueProgressTracker
+                rescueId={record.id}
+                reports={record.reports || []}
+                reportData={reportData}
+                onProgressUpdate={handleProgressUpdate}
+              />
+            </Col>
+          </Row>
+        )}
       </div>
+
+      {/* ----------------------- CANCEL MODAL ------------------------------ */}
+      <Modal
+        title="Cancel Rescue"
+        open={isCancelModalVisible}
+        onOk={handleCancelRescue}
+        onCancel={() => {
+          setIsCancelModalVisible(false);
+          setCancelReason("");
+        }}
+        confirmLoading={loading}
+        okText="Cancel Rescue"
+        okButtonProps={{ danger: true }}
+      >
+        <p>Are you sure you want to cancel this rescue campaign?</p>
+        <p className="text-gray-500 text-sm mb-4">
+          All assigned reports will be returned to pending status.
+        </p>
+        <Input.TextArea
+          rows={4}
+          placeholder="Reason for cancellation (optional)"
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+        />
+      </Modal>
+
+      {/* ----------------------- START RESCUE CONFIRMATION MODAL ------------------------------ */}
+      <Modal
+        title={
+          <span className="text-lg font-semibold">
+            <PlayCircleOutlined className="mr-2 text-blue-500" />
+            Start Rescue Campaign
+          </span>
+        }
+        open={isStartModalVisible}
+        onOk={handleStartRescue}
+        onCancel={() => setIsStartModalVisible(false)}
+        confirmLoading={loading}
+        okText="Start Rescue"
+        okButtonProps={{ type: "primary", size: "large" }}
+        cancelButtonProps={{ size: "large" }}
+      >
+        <div className="py-4">
+          <p className="text-base mb-3">
+            Are you sure you want to start this rescue campaign?
+          </p>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <strong>This will:</strong>
+            </p>
+            <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+              <li>Change the rescue status to "In Progress"</li>
+              <li>Notify all participants</li>
+              <li>Activate the progress tracker</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ----------------------- COMPLETE RESCUE CONFIRMATION MODAL ------------------------------ */}
+      <Modal
+        title={
+          <span className="text-lg font-semibold">
+            <CheckCircleOutlined className="mr-2 text-green-500" />
+            Complete Rescue Campaign
+          </span>
+        }
+        open={isCompleteModalVisible}
+        onOk={handleCompleteRescue}
+        onCancel={() => setIsCompleteModalVisible(false)}
+        confirmLoading={loading}
+        okText="Complete Rescue"
+        okButtonProps={{ type: "primary", size: "large" }}
+        cancelButtonProps={{ size: "large" }}
+      >
+        <div className="py-4">
+          <p className="text-base mb-3">
+            Are you sure you want to complete this rescue campaign?
+          </p>
+          <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <strong>This will:</strong>
+            </p>
+            <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+              <li>Mark the rescue as "Completed"</li>
+              <li>Update all successful reports to "Resolved"</li>
+              <li>Return cancelled/incomplete reports to "Pending"</li>
+              <li>Notify all participants of completion</li>
+            </ul>
+          </div>
+        </div>
+      </Modal>
     </Show>
   );
 };

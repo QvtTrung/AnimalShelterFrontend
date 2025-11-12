@@ -161,14 +161,12 @@ export const RescueMap: React.FC<RescueMapProps> = ({
   // Helper functions
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "planned":
-        return "blue";
-      case "in_progress":
+      case "pending":
         return "orange";
-      case "completed":
+      case "assigned":
+        return "blue";
+      case "resolved":
         return "green";
-      case "cancelled":
-        return "red";
       default:
         return "default";
     }
@@ -176,10 +174,12 @@ export const RescueMap: React.FC<RescueMapProps> = ({
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case "high":
+      case "critical":
         return "red";
-      case "medium":
+      case "high":
         return "orange";
+      case "medium":
+        return "yellow";
       case "low":
         return "green";
       default:
@@ -191,18 +191,27 @@ export const RescueMap: React.FC<RescueMapProps> = ({
     <Card
       title={
         <Space>
-          <EnvironmentOutlined className="text-blue-500" />
+          <EnvironmentOutlined className="text-green-500 text-xl" />
           <Title level={4} className="!m-0">
-            Included Reports
+            Rescue Locations
           </Title>
+          <Tag color="green" className="text-base">
+            {reportIds.length}{" "}
+            {reportIds.length === 1 ? "Location" : "Locations"}
+          </Tag>
         </Space>
       }
       variant="outlined"
-      className="h-[550px] rounded-2xl shadow-lg border border-gray-200 bg-white"
+      className="h-[550px] rounded-2xl shadow-xl border-2 border-green-100 bg-white"
+      headStyle={{
+        background: "#f8f9fa",
+        color: "#333",
+        borderBottom: "2px solid #e0e0e0",
+      }}
     >
       <div
         style={{ height: "450px" }}
-        className="w-full h-full rounded-lg overflow-hidden relative"
+        className="w-full h-full overflow-hidden"
       >
         <MapContainer
           center={mapCenter}

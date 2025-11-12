@@ -105,6 +105,16 @@ export const RescueForm: React.FC<RescueFormProps> = ({
     resource: "reports",
     optionLabel: "title",
     optionValue: "id",
+    filters: [
+      {
+        field: "status",
+        operator: "eq",
+        value: "pending",
+      },
+    ],
+    pagination: {
+      mode: "off",
+    },
   });
 
   const {
@@ -136,9 +146,13 @@ export const RescueForm: React.FC<RescueFormProps> = ({
       return message.error("User is already a participant");
 
     // Check if there are already enough participants
-    const requiredParticipants = formProps?.form?.getFieldValue('required_participants');
+    const requiredParticipants = formProps?.form?.getFieldValue(
+      "required_participants"
+    );
     if (requiredParticipants && participants.length >= requiredParticipants) {
-      return message.error(`Cannot add more participants. Maximum required participants (${requiredParticipants}) already reached.`);
+      return message.error(
+        `Cannot add more participants. Maximum required participants (${requiredParticipants}) already reached.`
+      );
     }
 
     const role = selectedUserRoles[selectedUserId] || "member";
@@ -350,9 +364,12 @@ export const RescueForm: React.FC<RescueFormProps> = ({
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setIsUserModalVisible(true)}
-            disabled={formProps?.form?.getFieldValue('required_participants') ? 
-                      participants.length >= formProps.form.getFieldValue('required_participants') : 
-                      false}
+            disabled={
+              formProps?.form?.getFieldValue("required_participants")
+                ? participants.length >=
+                  formProps.form.getFieldValue("required_participants")
+                : false
+            }
           >
             Add Participant
           </Button>

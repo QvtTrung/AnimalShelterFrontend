@@ -89,6 +89,7 @@ export interface IRescueReport {
   note?: string;
   date_created?: string;
   date_updated?: string;
+  updated_at?: string;
   report?: {
     id: string;
     title: string;
@@ -106,6 +107,7 @@ export interface IRescue {
   required_participants?: number;
   title?: string;
   description?: string;
+  cancellation_reason?: string;
   date_created?: string;
   date_updated?: string;
   participants?: IRescueParticipant[];

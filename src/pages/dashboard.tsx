@@ -1,9 +1,25 @@
-import { useGetIdentity, usePermissions } from "@refinedev/core";
-import { Row, Col, Card, Avatar, Typography, Space, Tag } from "antd";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useGetIdentity, useNavigation, useCustom } from "@refinedev/core";
+import {
+  Row,
+  Col,
+  Card,
+  Avatar,
+  Typography,
+  Space,
+  Tag,
+  Spin,
+  Select,
+  Alert,
+} from "antd";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 import L from "leaflet";
+import {
+  DashboardMap,
+  DashboardStats,
+  DashboardTimeline,
+  DashboardMapHandle,
+} from "../components/Dashboard";
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -17,137 +33,219 @@ const { Title, Text } = Typography;
 
 export const DashboardPage: React.FC = () => {
   const { data: user } = useGetIdentity({});
-  console.log("Dashboard - user data:", user);
-  const { data: permissions } = usePermissions({});
-  console.log("Dashboard - permissions:", permissions);
+  const { show } = useNavigation();
+  const [timeRange, setTimeRange] = useState("week");
+  const mapRef = useRef<DashboardMapHandle>(null);
 
-  // Default position (can be updated based on user location)
-  const [position, setPosition] = useState<[number, number]>([
-    10.0316, 105.7502,
-  ]); // Custom coordinates
+  // Fetch dashboard analytics using useCustom hook
+  const customResult = useCustom({
+    url: "/dashboard/analytics",
+    method: "get",
+  });
+
+  console.log("Full useCustom result:", customResult);
+  console.log("Query data:", customResult?.query?.data);
+  console.log("Query isLoading:", customResult?.query?.isLoading);
+  console.log("Query isError:", customResult?.query?.isError);
+
+  const isLoading = customResult?.query?.isLoading;
+  const isError = customResult?.query?.isError;
+
+  // Extract the actual data from the response
+  // The response structure is: query.data (from React Query) -> { data: { status, message, data: actualData } }
+  // So we need to go: query.data.data.data to get the actual analytics data
+  const responseWrapper = customResult?.query?.data;
+  const analytics = responseWrapper?.data?.data || responseWrapper?.data;
+
+  console.log("Response wrapper:", responseWrapper);
+  console.log("Analytics data:", analytics);
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large">
+          <div style={{ padding: "50px" }} />
+        </Spin>
+      </div>
+    );
+  }
+
+  if (isError || !analytics) {
+    return (
+      <div style={{ padding: "24px" }}>
+        <Alert
+          message="Error Loading Dashboard"
+          description={
+            <>
+              Failed to load dashboard data. Please try refreshing the page.
+              <br />
+              <small>Debug: {JSON.stringify(customResult?.query?.data)}</small>
+            </>
+          }
+          type="error"
+          showIcon
+        />
+      </div>
+    );
+  }
+
+  // Ensure analytics has the expected structure
+  if (!analytics.stats || !analytics.map || !analytics.recent) {
+    return (
+      <div style={{ padding: "24px" }}>
+        <Alert
+          message="Incomplete Dashboard Data"
+          description={
+            <>
+              The dashboard data structure is incomplete.
+              <br />
+              <small>Received: {JSON.stringify(analytics)}</small>
+            </>
+          }
+          type="warning"
+          showIcon
+        />
+      </div>
+    );
+  }
 
   return (
-    <Row gutter={[16, 16]}>
-      <Col xs={24}>
-        <Card>
-          <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Avatar size={64} src={user?.avatar} style={{ marginRight: 16 }}>
-                {user?.first_name?.charAt(0) ||
-                  user?.email?.charAt(0)?.toUpperCase()}
-              </Avatar>
-              <div>
-                <Title level={3} style={{ margin: 0 }}>
-                  {user?.first_name} {user?.last_name}
-                </Title>
-                <Text type="secondary">{user?.email}</Text>
-              </div>
-            </div>
-            <div>
-              <Space wrap>
-                <Tag color="blue">Role: {user?.role || "User"}</Tag>
-                {/* {permissions?.map((permission: string) => (
-                  <Tag key={permission} color="green">
-                    {permission}
-                  </Tag>
-                ))} */}
-              </Space>
-            </div>
-          </Space>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12} md={8}>
-        <Card title="Account Information" variant="borderless">
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <div>
-              <Text strong>First Name:</Text>
-              <br />
-              <Text>{user?.first_name || "N/A"}</Text>
-            </div>
-            <div>
-              <Text strong>Last Name:</Text>
-              <br />
-              <Text>{user?.last_name || "N/A"}</Text>
-            </div>
-            <div>
-              <Text strong>Email:</Text>
-              <br />
-              <Text>{user?.email || "N/A"}</Text>
-            </div>
-          </Space>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12} md={8}>
-        <Card title="System Information" variant="borderless">
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <div>
-              <Text strong>User ID:</Text>
-              <br />
-              <Text>{user?.id || "N/A"}</Text>
-            </div>
-            <div>
-              <Text strong>Account Created:</Text>
-              <br />
-              <Text>
-                {user?.date_created
-                  ? new Date(user.date_created).toLocaleDateString()
-                  : "N/A"}
-              </Text>
-            </div>
-            <div>
-              <Text strong>Last Updated:</Text>
-              <br />
-              <Text>
-                {user?.date_updated
-                  ? new Date(user.date_updated).toLocaleDateString()
-                  : "N/A"}
-              </Text>
-            </div>
-          </Space>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12} md={8}>
-        <Card title="Quick Stats" variant="borderless">
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <div>
-              <Text strong>Status:</Text>
-              <br />
-              <Tag color={user?.status === "active" ? "green" : "red"}>
-                {user?.status || "Unknown"}
-              </Tag>
-            </div>
-            <div>
-              <Text strong>Language:</Text>
-              <br />
-              <Text>{user?.language || "English"}</Text>
-            </div>
-            <div>
-              <Text strong>Timezone:</Text>
-              <br />
-              <Text>{user?.timezone || "UTC"}</Text>
-            </div>
-          </Space>
-        </Card>
-      </Col>
-      <Col xs={24}>
-        <Card title="Animal Rescue Map" variant="borderless">
-          <div style={{ height: "400px", width: "100%" }}>
-            <MapContainer
-              center={position}
-              zoom={15}
-              style={{ height: "100%", width: "100%" }}
+    <div style={{ padding: "0 0 24px 0" }}>
+      <Row gutter={[16, 16]}>
+        {/* Header Section */}
+        <Col xs={24}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+              flexWrap: "wrap",
+              gap: "16px",
+            }}
+          >
+            <Title
+              level={2}
+              style={{ margin: 0, fontFamily: "Inter, sans-serif" }}
             >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker position={position}>
-                <Popup>Your Location</Popup>
-              </Marker>
-            </MapContainer>
+              Overview
+            </Title>
+            <Select
+              value={timeRange}
+              onChange={setTimeRange}
+              style={{ width: 150 }}
+              options={[
+                { value: "today", label: "Today" },
+                { value: "week", label: "Last Week" },
+                { value: "month", label: "Last Month" },
+                { value: "year", label: "Last Year" },
+              ]}
+            />
           </div>
-        </Card>
-      </Col>
-    </Row>
+        </Col>
+
+        {/* Stats Cards */}
+        <Col xs={24}>
+          <DashboardStats
+            stats={
+              analytics.stats || {
+                reports: { total: 0, pending: 0, assigned: 0, resolved: 0 },
+                rescues: { total: 0, in_progress: 0, success: 0, cancelled: 0 },
+                adoptions: {
+                  total: 0,
+                  pending: 0,
+                  confirming: 0,
+                  confirmed: 0,
+                  completed: 0,
+                  cancelled: 0,
+                },
+                pets: { total: 0, available: 0, adopted: 0 },
+              }
+            }
+          />
+        </Col>
+
+        {/* Map and Timeline Row */}
+        <Col xs={24} lg={14}>
+          <DashboardMap
+            ref={mapRef}
+            pendingReports={analytics.map?.pendingReports || []}
+            inProgressRescues={analytics.map?.inProgressRescues || []}
+            onShowReport={(id) => show("reports", id)}
+            onShowRescue={(id) => show("rescues", id)}
+          />
+        </Col>
+
+        <Col xs={24} lg={10}>
+          <DashboardTimeline
+            recentReports={analytics.recent?.reports || []}
+            recentRescues={analytics.recent?.rescues || []}
+            recentAdoptions={analytics.recent?.adoptions || []}
+            onShowReport={(id) => show("reports", id)}
+            onShowRescue={(id) => show("rescues", id)}
+            onShowAdoption={(id) => show("adoptions", id)}
+            onReportClick={(id) => mapRef.current?.flyToReport(id)}
+            onRescueClick={(id) => mapRef.current?.flyToRescue(id)}
+          />
+        </Col>
+
+        {/* User Info Section */}
+        <Col xs={24}>
+          <Card
+            style={{
+              borderRadius: "1rem",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Avatar
+                  size={64}
+                  src={user?.avatar}
+                  style={{ marginRight: 16 }}
+                >
+                  {user?.first_name?.charAt(0) ||
+                    user?.email?.charAt(0)?.toUpperCase()}
+                </Avatar>
+                <div>
+                  <Title
+                    level={3}
+                    style={{ margin: 0, fontFamily: "Inter, sans-serif" }}
+                  >
+                    {user?.first_name} {user?.last_name}
+                  </Title>
+                  <Text
+                    type="secondary"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    {user?.email}
+                  </Text>
+                </div>
+              </div>
+              <div>
+                <Space wrap>
+                  <Tag color="blue" style={{ fontFamily: "Inter, sans-serif" }}>
+                    Role: {user?.role || "User"}
+                  </Tag>
+                  <Tag
+                    color={user?.status === "active" ? "green" : "red"}
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    Status: {user?.status || "Unknown"}
+                  </Tag>
+                </Space>
+              </div>
+            </Space>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };

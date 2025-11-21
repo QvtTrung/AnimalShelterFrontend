@@ -229,7 +229,7 @@ export const RescueShow = () => {
               title={
                 <Space>
                   <FileTextOutlined className="text-blue-500" />
-                  <Title level={4} className="!m-0">
+                  <Title level={4} className="m-0!">
                     Rescue Information
                   </Title>
                 </Space>
@@ -320,7 +320,7 @@ export const RescueShow = () => {
                     {record?.status === "completed" && (
                       <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
                         <CheckCircleOutlined className="text-4xl text-green-600 mb-2" />
-                        <Title level={5} className="!mb-1 text-gray-800">
+                        <Title level={5} className="mb-1! text-gray-800">
                           Rescue Completed
                         </Title>
                         <Text className="text-gray-700">
@@ -332,7 +332,7 @@ export const RescueShow = () => {
                     {record?.status === "cancelled" && (
                       <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
                         <StopOutlined className="text-4xl text-red-600 mb-2" />
-                        <Title level={5} className="!mb-1 text-gray-800">
+                        <Title level={5} className="mb-1! text-gray-800">
                           Rescue Cancelled
                         </Title>
                         <Text className="text-gray-700">
@@ -356,7 +356,7 @@ export const RescueShow = () => {
                   <div className="overflow-y-auto">
                     <List
                       dataSource={record?.reports ?? []}
-                      className="!mt-2"
+                      className="mt-2!"
                       renderItem={(item) => {
                         // item.reports_id === the actual report ID
                         const report = reportData.find(
@@ -432,7 +432,7 @@ export const RescueShow = () => {
               title={
                 <Space>
                   <TeamOutlined className="text-purple-500" />
-                  <Title level={4} className="!m-0">
+                  <Title level={4} className="m-0!">
                     Participants
                   </Title>
                   <Tag color="blue" className="text-base px-3 py-1">
@@ -458,7 +458,7 @@ export const RescueShow = () => {
                     <List.Item>
                       <Card
                         hoverable
-                        className="text-center cursor-pointer pt-[10px] shadow-md hover:shadow-lg transition-shadow border border-gray-200"
+                        className="text-center cursor-pointer pt-2.5 shadow-md hover:shadow-lg transition-shadow border border-gray-200"
                         onClick={() => show("users", item.users_id)}
                         cover={
                           <div className="bg-gray-50 flex justify-center py-4">

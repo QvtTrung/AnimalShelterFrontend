@@ -192,7 +192,7 @@ export const RescueMap: React.FC<RescueMapProps> = ({
       title={
         <Space>
           <EnvironmentOutlined className="text-green-500 text-xl" />
-          <Title level={4} className="!m-0">
+          <Title level={4} className="m-0!">
             Rescue Locations
           </Title>
           <Tag color="green" className="text-base">

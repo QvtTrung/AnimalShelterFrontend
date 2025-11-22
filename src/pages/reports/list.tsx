@@ -161,21 +161,68 @@ export const ReportList = () => {
         style={{ tableLayout: "fixed" }}
       >
         {/* TITLE */}
-        <Table.Column title="Title" dataIndex="title" width={40} sorter />
+        <Table.Column
+          title="Title"
+          dataIndex="title"
+          width={150}
+          sorter
+          ellipsis={{ showTitle: false }}
+          render={(value) => (
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value}
+            </div>
+          )}
+        />
 
         {/* DESCRIPTION */}
-        <Table.Column title="Description" dataIndex="description" width={40} />
+        <Table.Column
+          title="Description"
+          dataIndex="description"
+          width={200}
+          ellipsis={{ showTitle: false }}
+          render={(value) => (
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value || "-"}
+            </div>
+          )}
+        />
 
         {/* SPECIES */}
-        <Table.Column title="Species" dataIndex="species" width={30} sorter />
+        <Table.Column title="Species" dataIndex="species" width={100} sorter />
 
         {/* LOCATION */}
         <Table.Column
           title="Location"
           dataIndex="location"
-          width={50}
-          ellipsis={true} // Native ellipsis
+          width={150}
+          ellipsis={{ showTitle: false }}
           sorter
+          render={(value) => (
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value || "-"}
+            </div>
+          )}
         />
 
         {/* TYPE */}
@@ -183,7 +230,7 @@ export const ReportList = () => {
           title="Type"
           align="center"
           dataIndex="type"
-          width={30}
+          width={120}
           sorter
           render={(value) => {
             const colors: Record<string, string> = {
@@ -201,7 +248,7 @@ export const ReportList = () => {
           align="center"
           title="Urgency"
           dataIndex="urgency_level"
-          width={30}
+          width={100}
           sorter
           render={(value) => {
             const colors: Record<string, string> = {
@@ -219,7 +266,7 @@ export const ReportList = () => {
           align="center"
           title="Status"
           dataIndex="status"
-          width={30}
+          width={100}
           sorter
           render={(value) => {
             const colors: Record<string, string> = {
@@ -235,7 +282,7 @@ export const ReportList = () => {
         <Table.Column
           title="Created"
           dataIndex="date_created"
-          width={35}
+          width={120}
           sorter
           render={(value) => new Date(value).toLocaleDateString()}
         />
@@ -243,7 +290,7 @@ export const ReportList = () => {
         {/* ACTIONS */}
         <Table.Column
           title="Actions"
-          width={30}
+          width={100}
           render={(_, record: any) => (
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />

@@ -212,7 +212,7 @@ export const RescueShow = () => {
   /* ----------------------------------------------------------------------- */
   return (
     <Show isLoading={isLoading}>
-      <div className="bg-gray-50 p-4 sm:p-6 rounded-xl">
+      <div className="bg-gray-50 rounded-xl">
         <Row gutter={[16, 16]}>
           {/* --------------------------- MAP ----------------------------------- */}
           <Col xs={24} lg={16}>
@@ -235,12 +235,8 @@ export const RescueShow = () => {
                 </Space>
               }
               variant="outlined"
-              className="h-[550px] rounded-2xl shadow-lg border border-gray-200 bg-white overflow-y-scroll"
-              headStyle={{
-                background: "#f8f9fa",
-                color: "#333",
-                borderBottom: "2px solid #e0e0e0",
-              }}
+              className="h-[550px] rounded-2xl shadow-lg overflow-y-scroll"
+              style={{ backgroundColor: "inherit" }}
             >
               <div className="px-2 sm:px-3 overflow-y-auto h-full">
                 <Space direction="vertical" className="w-full">
@@ -357,6 +353,7 @@ export const RescueShow = () => {
                     <List
                       dataSource={record?.reports ?? []}
                       className="mt-2!"
+                      pagination={false}
                       renderItem={(item) => {
                         // item.reports_id === the actual report ID
                         const report = reportData.find(
@@ -442,26 +439,23 @@ export const RescueShow = () => {
                 </Space>
               }
               variant="outlined"
-              className="rounded-2xl shadow-lg border border-gray-200 bg-white overflow-hidden"
-              headStyle={{
-                background: "#f8f9fa",
-                color: "#333",
-                borderBottom: "2px solid #e0e0e0",
-              }}
+              className="rounded-2xl shadow-lg overflow-hidden"
+              style={{ backgroundColor: "inherit" }}
             >
               <List
                 grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
                 dataSource={record?.participants ?? []}
+                pagination={false}
                 renderItem={(item) => {
                   const user = getUserDetails(item.users_id);
                   return (
                     <List.Item>
                       <Card
                         hoverable
-                        className="text-center cursor-pointer pt-2.5 shadow-md hover:shadow-lg transition-shadow border border-gray-200"
+                        className="text-center cursor-pointer pt-2.5 shadow-md hover:shadow-lg transition-shadow"
                         onClick={() => show("users", item.users_id)}
                         cover={
-                          <div className="bg-gray-50 flex justify-center py-4">
+                          <div className="flex justify-center py-4">
                             <Avatar
                               size={64}
                               src={user?.avatar}

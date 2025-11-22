@@ -202,6 +202,7 @@ export const DashboardPage: React.FC = () => {
             style={{
               borderRadius: "1rem",
               boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+              backgroundColor: "inherit",
             }}
           >
             <Space direction="vertical" size="large" style={{ width: "100%" }}>

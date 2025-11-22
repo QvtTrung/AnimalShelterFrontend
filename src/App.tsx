@@ -24,7 +24,7 @@ import routerProvider, {
   DocumentTitleHandler,
 } from "@refinedev/react-router";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
-import { App as AntdApp, ConfigProvider, Form, Input } from "antd";
+import { App as AntdApp, ConfigProvider, Form, Input, theme } from "antd";
 
 import "@ant-design/v5-patch-for-react-19";
 import "@refinedev/antd/dist/reset.css";
@@ -52,6 +52,7 @@ import {
   RescueShow,
   RescueCreate,
 } from "../src/pages/rescues";
+import { ProfilePage } from "../src/pages/profile";
 import { DashboardPage } from "../src/pages/dashboard";
 import { RegisterPage } from "../src/pages/register";
 import { authProvider } from "./providers/authProvider";
@@ -59,10 +60,12 @@ import { ThemedHeader } from "./components/layout/header";
 import { ThemedLayout } from "./components/layout";
 import { ThemedSider } from "./components/layout/sider";
 import { ThemedTitle } from "./components/layout/title";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { useEffect } from "react";
 import { initTokenManager } from "./utils/tokenManager";
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { isDarkMode } = useTheme();
   // Initialize token manager on app load
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -71,9 +74,23 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Update data-theme attribute for CSS
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, [isDarkMode]);
+
   return (
     <BrowserRouter>
-      <ConfigProvider theme={RefineThemes.Blue}>
+      <ConfigProvider
+        theme={{
+          ...RefineThemes.Blue,
+          algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        }}
+      >
         <AntdApp>
           <Refine
             authProvider={authProvider}
@@ -209,6 +226,7 @@ const App: React.FC = () => {
                   <Route path="edit/:id" element={<RescueEdit />} />
                   <Route path="show/:id" element={<RescueShow />} />
                 </Route>
+                <Route path="/profile" element={<ProfilePage />} />
               </Route>
 
               <Route
@@ -296,6 +314,14 @@ const App: React.FC = () => {
         </AntdApp>
       </ConfigProvider>
     </BrowserRouter>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 

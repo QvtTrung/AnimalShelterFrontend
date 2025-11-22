@@ -165,15 +165,7 @@ export const DashboardTimeline: React.FC<DashboardTimelineProps> = ({
       style={{
         borderRadius: "1rem",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        border: "1px solid #f3f4f6",
-        backgroundColor: "#ffffff",
         height: "100%",
-      }}
-      headStyle={{
-        background: "#f9fafb",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "16px 24px",
-        fontFamily: "Inter, sans-serif",
       }}
       bodyStyle={{
         padding: "16px",
@@ -203,7 +195,6 @@ export const DashboardTimeline: React.FC<DashboardTimelineProps> = ({
                 width: "24px",
                 height: "24px",
                 borderRadius: "50%",
-                backgroundColor: "#ffffff",
                 border: `2px solid ${getTypeColor(item.type)}`,
                 display: "flex",
                 alignItems: "center",
@@ -233,10 +224,8 @@ export const DashboardTimeline: React.FC<DashboardTimelineProps> = ({
             {/* Content */}
             <div
               style={{
-                backgroundColor: "#f9fafb",
                 borderRadius: "8px",
                 padding: "12px",
-                border: "1px solid #e5e7eb",
               }}
             >
               <div
@@ -285,7 +274,6 @@ export const DashboardTimeline: React.FC<DashboardTimelineProps> = ({
                     style={{
                       display: "block",
                       fontSize: "0.875rem",
-                      color: "#111827",
                       marginBottom: "4px",
                       fontFamily: "Inter, sans-serif",
                       cursor: item.onClick ? "pointer" : "default",

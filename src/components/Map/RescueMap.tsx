@@ -202,12 +202,8 @@ export const RescueMap: React.FC<RescueMapProps> = ({
         </Space>
       }
       variant="outlined"
-      className="h-[550px] rounded-2xl shadow-xl border-2 border-green-100 bg-white"
-      headStyle={{
-        background: "#f8f9fa",
-        color: "#333",
-        borderBottom: "2px solid #e0e0e0",
-      }}
+      className="h-[550px] rounded-2xl shadow-xl"
+      style={{ backgroundColor: "inherit" }}
     >
       <div
         style={{ height: "450px" }}
@@ -234,26 +230,33 @@ export const RescueMap: React.FC<RescueMapProps> = ({
               return (
                 <Marker key={report.id} position={[lat, lng]}>
                   <Popup>
-                    <div>
-                      <Title level={5}>{report.title}</Title>
-                      <Space direction="vertical" size="small">
-                        <Text>
-                          <strong>Status:</strong>{" "}
+                    <div style={{ minWidth: "200px" }}>
+                      <Title level={5} style={{ marginBottom: "8px" }}>
+                        {report.title}
+                      </Title>
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%" }}
+                      >
+                        <div>
+                          <Text strong>Status: </Text>
                           <Tag color={getStatusColor(report.status ?? "")}>
                             {report.status}
                           </Tag>
-                        </Text>
-                        <Text>
-                          <strong>Urgency:</strong>{" "}
+                        </div>
+                        <div>
+                          <Text strong>Urgency: </Text>
                           <Tag
                             color={getUrgencyColor(report.urgency_level ?? "")}
                           >
                             {report.urgency_level}
                           </Tag>
-                        </Text>
-                        <Text>
-                          <strong>Location:</strong> {report.location}
-                        </Text>
+                        </div>
+                        <div>
+                          <Text strong>Location: </Text>
+                          <Text>{report.location}</Text>
+                        </div>
                         <Button
                           type="primary"
                           size="small"

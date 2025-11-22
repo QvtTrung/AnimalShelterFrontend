@@ -282,14 +282,6 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
         style={{
           borderRadius: "1rem",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          border: "1px solid #f3f4f6",
-          backgroundColor: "#ffffff",
-        }}
-        headStyle={{
-          background: "#f9fafb",
-          borderBottom: "1px solid #e5e7eb",
-          padding: "16px 24px",
-          fontFamily: "Inter, sans-serif",
         }}
         bodyStyle={{ padding: "0", height: "450px" }}
       >

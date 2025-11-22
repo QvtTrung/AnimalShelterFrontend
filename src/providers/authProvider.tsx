@@ -280,7 +280,7 @@ export const authProvider: AuthProvider = {
       const appUser = appUserStr ? JSON.parse(appUserStr) : null;
       // Return user identity in the format expected by Refine
       const identity = {
-        id: directusUser.id,
+        id: appUser?.id || directusUser.id,
         first_name: directusUser.first_name || "",
         last_name: directusUser.last_name || "",
         name: `${directusUser.first_name || ""} ${
@@ -289,7 +289,9 @@ export const authProvider: AuthProvider = {
         email: directusUser.email || "",
         avatar: appUser?.avatar || null,
         role: appUser?.role || "User",
-        status: directusUser.status || "active",
+        status: appUser?.status || "active",
+        phone_number: appUser?.phone_number || "",
+        address: appUser?.address || "",
         date_created: directusUser.date_created || new Date().toISOString(),
         date_updated: directusUser.date_updated || new Date().toISOString(),
         language: directusUser.language || "English",

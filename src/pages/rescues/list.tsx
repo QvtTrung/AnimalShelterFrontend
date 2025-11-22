@@ -320,18 +320,24 @@ export const RescueList = () => {
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} items`,
         }}
+        scroll={{ x: 1200 }}
+        style={{ tableLayout: "fixed" }}
       >
         <Table.Column
           dataIndex="title"
           title="Title"
+          width={200}
           sorter
+          ellipsis={{ showTitle: false }}
           render={(value, record: IRescue) => (
-            <Space>
-              <TextField value={value} />
+            <div title={value}>
+              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>
+                {value}
+              </div>
               <Tag color={getStatusColor(record.status || "")}>
                 {record.status?.toUpperCase()}
               </Tag>
-            </Space>
+            </div>
           )}
         />
         <Table.Column
@@ -394,9 +400,12 @@ export const RescueList = () => {
         <Table.Column
           dataIndex="description"
           title="Description"
+          width={250}
           ellipsis={{ showTitle: false }}
           render={(value) => (
-            <TextField value={value} style={{ maxWidth: 200 }} />
+            <div title={value} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {value || '-'}
+            </div>
           )}
         />
         <Table.Column

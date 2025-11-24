@@ -1,6 +1,4 @@
-import { useShow, useCustom } from "@refinedev/core";
-import { useApi } from "../../hooks/useApi";
-import { useState, useEffect } from "react";
+import { useShow } from "@refinedev/core";
 
 import { Show } from "@refinedev/antd";
 
@@ -17,67 +15,15 @@ export const ReportShow = () => {
   const record = data?.data;
   console.log("data:", data);
   console.log("record:", record);
-  const { useApiList, useApiCustom, useApiOne } = useApi();
+  // Backend already populates user_created as an object with user data
+  // No need to fetch separately - just use it directly
+  const reporterData =
+    typeof record?.user_created === "object" ? record.user_created : null;
 
-  // Fetch reporter information using useApiCustom with getUserByDirectusId route
-  const { query: reporterQuery } = useApiCustom(
-    `/users/directus/${record?.user_created}`,
-    "get",
-    {
-      queryOptions: {
-        enabled: !!record?.user_created,
-      },
-    }
-  );
-  const reporter = reporterQuery?.data?.data?.data;
-  console.log("reporter:", reporter);
+  console.log("reporter:", reporterData);
 
-  // Define expected response type
-  interface ReportImagesResponse {
-    data: any[];
-  }
-
-  useEffect(() => {
-    // Component will re-render when record ID changes
-  }, [record?.id]);
-
-  // Fetch report images using useApiCustom hook
-  const imagesQueryResult = useApiCustom(
-    `/reports/${record?.id}/images`,
-    "get",
-    {
-      queryOptions: {
-        enabled: !!record?.id,
-        retry: 1,
-        retryDelay: 1000,
-        onError: (error: any) => {
-          console.error("Error fetching images:", error);
-        },
-      },
-    }
-  );
-
-  // Extract data with proper typing based on UseCustomReturnType
-  // The data is in imagesQueryResult.result.data according to UseCustomReturnType
-  const imageData = imagesQueryResult?.result?.data;
-  // Loading state is in imagesQueryResult.query.isLoading
-  const imagesLoading = imagesQueryResult?.query?.isLoading || false;
-
-  // Extract images from response
-  // The imageData.data contains array of images
-
-  // Add fallback for when imageData is undefined or has no data
-  let images = [];
-  if (imageData && imageData.data) {
-    // Check if data is directly an array or nested
-    if (Array.isArray(imageData.data)) {
-      images = imageData.data;
-    } else if (imageData.data.data && Array.isArray(imageData.data.data)) {
-      images = imageData.data.data;
-    }
-  }
-
-  // Log for debugging
+  // Backend already includes images in the report data (reports_image field)
+  const images = record?.reports_image || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -143,10 +89,11 @@ export const ReportShow = () => {
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Reporter">
-          {reporter?.first_name || "Loading..."} {reporter?.last_name || ""}
+          {reporterData?.first_name || "Loading..."}{" "}
+          {reporterData?.last_name || ""}
         </Descriptions.Item>
         <Descriptions.Item label="Reporter Email">
-          {reporter?.email || "Loading..."}
+          {reporterData?.email || "Loading..."}
         </Descriptions.Item>
         <Descriptions.Item label="Status">
           <Tag color={getStatusColor(record?.status || "")}>
@@ -165,13 +112,12 @@ export const ReportShow = () => {
         </Descriptions.Item>
         {/* Coordinates map moved outside of table */}
         <Descriptions.Item label="Images">
-          {imagesLoading ? (
+          {!record ? (
             <span>Loading images...</span>
           ) : images.length > 0 ? (
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
               dataSource={images}
-              loading={imagesLoading}
               renderItem={(item: any) => {
                 return (
                   <List.Item>

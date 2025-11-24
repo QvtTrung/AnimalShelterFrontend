@@ -18,6 +18,7 @@ import {
 import type { RefineThemedLayoutHeaderProps } from "@refinedev/antd";
 import type { MenuProps } from "antd";
 import { useTheme } from "../../contexts/ThemeContext";
+import { NotificationDropdown } from "../Notifications";
 
 export const ThemedHeader: React.FC<RefineThemedLayoutHeaderProps> = ({
   sticky,
@@ -81,6 +82,7 @@ export const ThemedHeader: React.FC<RefineThemedLayoutHeaderProps> = ({
             unCheckedChildren="Light"
           />
         </Space>
+        <NotificationDropdown />
         <Dropdown
           menu={{ items: menuItems }}
           placement="bottomRight"

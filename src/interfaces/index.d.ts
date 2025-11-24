@@ -58,7 +58,8 @@ export interface IReport {
   urgency_level: "low" | "medium" | "high" | "critical";
   date_created?: string;
   date_updated?: string;
-  user_created?: string;
+  user_created?: string | IUser; // Can be directus user ID string or populated user object
+  reports_image?: Array<{ id: string; image_url: string; report_id: string }>; // Populated images
   coordinates?: {
     type: "Point";
     coordinates: [number, number]; // [longitude, latitude]
@@ -112,4 +113,17 @@ export interface IRescue {
   date_updated?: string;
   participants?: IRescueParticipant[];
   reports?: IRescueReport[];
+}
+
+export interface INotification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: "adoption" | "rescue" | "report" | "system";
+  related_id?: string;
+  is_read: boolean;
+  read_at?: string;
+  date_created?: string;
+  date_updated?: string;
 }

@@ -34,6 +34,7 @@
     "@uiw/react-md-editor": "^4.0.8",
     "antd": "^5.23.0",
     "axios": "^1.6.0",
+    "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",
     "query-string": "^9.3.1",
     "react": "^19.1.0",

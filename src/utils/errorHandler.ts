@@ -11,17 +11,17 @@ export interface ApiError {
 
 // Default error messages
 const DEFAULT_ERROR_MESSAGES: Record<number, string> = {
-  400: "Bad request. Please check your input.",
-  401: "You are not authorized to perform this action.",
-  403: "You do not have permission to perform this action.",
-  404: "The requested resource was not found.",
-  409: "There was a conflict with the current state of the resource.",
-  422: "The provided data is invalid.",
-  429: "Too many requests. Please try again later.",
-  500: "An unexpected error occurred. Please try again.",
-  502: "The server encountered an error. Please try again later.",
-  503: "The service is currently unavailable. Please try again later.",
-  504: "The request timed out. Please try again.",
+  400: "Yêu cầu không hợp lệ. Vui lòng kiểm tra thông tin nhập.",
+  401: "Bạn không có quyền thực hiện hành động này.",
+  403: "Bạn không có quyền thực hiện hành động này.",
+  404: "Không tìm thấy tài nguyên yêu cầu.",
+  409: "Có xung đột với trạng thái hiện tại của tài nguyên.",
+  422: "Dữ liệu cung cấp không hợp lệ.",
+  429: "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+  500: "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+  502: "Máy chủ gặp lỗi. Vui lòng thử lại sau.",
+  503: "Dịch vụ hiện không khả dụng. Vui lòng thử lại sau.",
+  504: "Yêu cầu hết thời gian. Vui lòng thử lại.",
 };
 
 // Function to handle API errors consistently
@@ -36,7 +36,7 @@ export const handleApiError = (error: any): ApiError => {
     const { status, data } = error.response;
 
     // Try to get the error message from the response
-    let errorMessage = data?.message || data?.error || DEFAULT_ERROR_MESSAGES[status] || "An unknown error occurred.";
+    let errorMessage = data?.message || data?.error || DEFAULT_ERROR_MESSAGES[status] || "Đã xảy ra lỗi không xác định.";
 
     // If there are validation errors, include them
     if (data?.errors && Array.isArray(data.errors)) {
@@ -55,7 +55,7 @@ export const handleApiError = (error: any): ApiError => {
   if (error.request) {
     return {
       name: "NetworkError",
-      message: "Network error. Please check your connection and try again.",
+      message: "Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
       statusCode: 0,
     };
   }
@@ -63,7 +63,7 @@ export const handleApiError = (error: any): ApiError => {
   // Unknown error
   return {
     name: "UnknownError",
-    message: error.message || "An unknown error occurred.",
+    message: error.message || "Đã xảy ra lỗi không xác định.",
     statusCode: 0,
   };
 };

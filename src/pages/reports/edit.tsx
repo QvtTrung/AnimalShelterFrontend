@@ -9,6 +9,22 @@ export const ReportEdit = () => {
 
   const { formProps } = useForm({
     id,
+    meta: {
+      fields: [
+        "id",
+        "title",
+        "description",
+        "species",
+        "type",
+        "location",
+        "coordinates",
+        "urgency_level",
+        "status",
+        "date_created",
+        "date_updated",
+        "reports_image.*",
+      ],
+    },
   });
 
   return (

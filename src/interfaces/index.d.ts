@@ -60,6 +60,7 @@ export interface IReport {
   date_updated?: string;
   user_created?: string | IUser; // Can be directus user ID string or populated user object
   reports_image?: Array<{ id: string; image_url: string; report_id: string }>; // Populated images
+  images?: Array<{ id: string; image_url: string; report_id: string }>; // Alternative field name
   coordinates?: {
     type: "Point";
     coordinates: [number, number]; // [longitude, latitude]

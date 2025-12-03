@@ -1,4 +1,9 @@
-import { useGetIdentity, useNavigation, useCustom } from "@refinedev/core";
+import {
+  useGetIdentity,
+  useNavigation,
+  useCustom,
+  useList,
+} from "@refinedev/core";
 import {
   Row,
   Col,
@@ -19,6 +24,7 @@ import {
   DashboardStats,
   DashboardTimeline,
   DashboardMapHandle,
+  DashboardNotifications,
 } from "../components/Dashboard";
 
 // Fix for default markers in react-leaflet
@@ -37,16 +43,27 @@ export const DashboardPage: React.FC = () => {
   const [timeRange, setTimeRange] = useState("week");
   const mapRef = useRef<DashboardMapHandle>(null);
 
+  // Fetch recent notifications
+  const notificationsResult = useList({
+    resource: "notifications",
+    pagination: {
+      pageSize: 5,
+    },
+    sorters: [
+      {
+        field: "date_created",
+        order: "desc",
+      },
+    ],
+  });
+
+  const recentNotifications = notificationsResult?.result?.data || [];
+
   // Fetch dashboard analytics using useCustom hook
   const customResult = useCustom({
     url: "/dashboard/analytics",
     method: "get",
   });
-
-  console.log("Full useCustom result:", customResult);
-  console.log("Query data:", customResult?.query?.data);
-  console.log("Query isLoading:", customResult?.query?.isLoading);
-  console.log("Query isError:", customResult?.query?.isError);
 
   const isLoading = customResult?.query?.isLoading;
   const isError = customResult?.query?.isError;
@@ -56,9 +73,6 @@ export const DashboardPage: React.FC = () => {
   // So we need to go: query.data.data.data to get the actual analytics data
   const responseWrapper = customResult?.query?.data;
   const analytics = responseWrapper?.data?.data || responseWrapper?.data;
-
-  console.log("Response wrapper:", responseWrapper);
-  console.log("Analytics data:", analytics);
 
   if (isLoading) {
     return (
@@ -81,10 +95,10 @@ export const DashboardPage: React.FC = () => {
     return (
       <div style={{ padding: "24px" }}>
         <Alert
-          message="Error Loading Dashboard"
+          message="Lỗi Tải Bảng Điều khiển"
           description={
             <>
-              Failed to load dashboard data. Please try refreshing the page.
+              Không thể tải dữ liệu bảng điều khiển. Vui lòng thử làm mới trang.
               <br />
               <small>Debug: {JSON.stringify(customResult?.query?.data)}</small>
             </>
@@ -101,10 +115,10 @@ export const DashboardPage: React.FC = () => {
     return (
       <div style={{ padding: "24px" }}>
         <Alert
-          message="Incomplete Dashboard Data"
+          message="Dữ liệu Bảng Điều khiển Không Đầy Đủ"
           description={
             <>
-              The dashboard data structure is incomplete.
+              Cấu trúc dữ liệu bảng điều khiển không đầy đủ.
               <br />
               <small>Received: {JSON.stringify(analytics)}</small>
             </>
@@ -135,17 +149,17 @@ export const DashboardPage: React.FC = () => {
               level={2}
               style={{ margin: 0, fontFamily: "Inter, sans-serif" }}
             >
-              Overview
+              Tổng quan
             </Title>
             <Select
               value={timeRange}
               onChange={setTimeRange}
               style={{ width: 150 }}
               options={[
-                { value: "today", label: "Today" },
-                { value: "week", label: "Last Week" },
-                { value: "month", label: "Last Month" },
-                { value: "year", label: "Last Year" },
+                { value: "today", label: "Hôm nay" },
+                { value: "week", label: "Tuần qua" },
+                { value: "month", label: "Tháng qua" },
+                { value: "year", label: "Năm qua" },
               ]}
             />
           </div>
@@ -177,7 +191,11 @@ export const DashboardPage: React.FC = () => {
           <DashboardMap
             ref={mapRef}
             pendingReports={analytics.map?.pendingReports || []}
-            inProgressRescues={analytics.map?.inProgressRescues || []}
+            allRescues={
+              analytics.map?.allRescues ||
+              analytics.map?.inProgressRescues ||
+              []
+            }
             onShowReport={(id) => show("reports", id)}
             onShowRescue={(id) => show("rescues", id)}
           />
@@ -192,8 +210,15 @@ export const DashboardPage: React.FC = () => {
             onShowRescue={(id) => show("rescues", id)}
             onShowAdoption={(id) => show("adoptions", id)}
             onReportClick={(id) => mapRef.current?.flyToReport(id)}
-            onRescueClick={(id) => mapRef.current?.flyToRescue(id)}
+            onRescueClick={(id, reports) =>
+              mapRef.current?.flyToRescue(id, reports)
+            }
           />
+        </Col>
+
+        {/* Notifications Section */}
+        <Col xs={24}>
+          <DashboardNotifications notifications={recentNotifications} />
         </Col>
 
         {/* User Info Section */}
@@ -233,13 +258,13 @@ export const DashboardPage: React.FC = () => {
               <div>
                 <Space wrap>
                   <Tag color="blue" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Role: {user?.role || "User"}
+                    Vai trò: {user?.role || "Người dùng"}
                   </Tag>
                   <Tag
                     color={user?.status === "active" ? "green" : "red"}
                     style={{ fontFamily: "Inter, sans-serif" }}
                   >
-                    Status: {user?.status || "Unknown"}
+                    Trạng thái: {user?.status || "Không rõ"}
                   </Tag>
                 </Space>
               </div>

@@ -14,6 +14,7 @@ import {
   HeartOutlined,
   FileTextOutlined,
   SafetyOutlined,
+  BellOutlined,
 } from "@ant-design/icons";
 
 import { dataProvider } from "./providers/dataProvider";
@@ -29,6 +30,7 @@ import { App as AntdApp, ConfigProvider, Form, Input, theme } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import "@refinedev/antd/dist/reset.css";
 import "./index.css";
+import { LoginPage } from "./pages/login";
 
 import { PetList, PetEdit, PetShow, PetCreate } from "../src/pages/pets";
 import { UserList, UserEdit, UserShow, UserCreate } from "../src/pages/users";
@@ -52,6 +54,7 @@ import {
   RescueShow,
   RescueCreate,
 } from "../src/pages/rescues";
+import { NotificationList, NotificationShow } from "../src/pages/notifications";
 import { ProfilePage } from "../src/pages/profile";
 import { DashboardPage } from "../src/pages/dashboard";
 import { RegisterPage } from "../src/pages/register";
@@ -101,7 +104,7 @@ const AppContent: React.FC = () => {
                 name: "dashboard",
                 list: "/",
                 meta: {
-                  label: "Dashboard",
+                  label: "Bảng điều khiển",
                   icon: <DashboardOutlined />,
                 },
               },
@@ -112,7 +115,7 @@ const AppContent: React.FC = () => {
                 show: "/pets/show/:id",
                 edit: "/pets/edit/:id",
                 meta: {
-                  label: "Pets",
+                  label: "Thú cưng",
                   icon: <HomeOutlined />,
                 },
               },
@@ -123,7 +126,7 @@ const AppContent: React.FC = () => {
                 show: "/users/show/:id",
                 edit: "/users/edit/:id",
                 meta: {
-                  label: "Users",
+                  label: "Người dùng",
                   icon: <UserOutlined />,
                 },
               },
@@ -134,7 +137,7 @@ const AppContent: React.FC = () => {
                 show: "/adoptions/show/:id",
                 edit: "/adoptions/edit/:id",
                 meta: {
-                  label: "Adoptions",
+                  label: "Nhận nuôi",
                   icon: <HeartOutlined />,
                 },
               },
@@ -145,7 +148,7 @@ const AppContent: React.FC = () => {
                 show: "/reports/show/:id",
                 edit: "/reports/edit/:id",
                 meta: {
-                  label: "Reports",
+                  label: "Báo cáo",
                   icon: <FileTextOutlined />,
                 },
               },
@@ -156,8 +159,17 @@ const AppContent: React.FC = () => {
                 show: "/rescues/show/:id",
                 edit: "/rescues/edit/:id",
                 meta: {
-                  label: "Rescues",
+                  label: "Cứu hộ",
                   icon: <SafetyOutlined />,
+                },
+              },
+              {
+                name: "notifications",
+                list: "/notifications",
+                show: "/notifications/show/:id",
+                meta: {
+                  label: "Thông báo",
+                  icon: <BellOutlined />,
                 },
               },
             ]}
@@ -167,12 +179,12 @@ const AppContent: React.FC = () => {
               warnWhenUnsavedChanges: true,
               disableServerSideValidation: true,
               title: {
-                text: "Animal Shelter",
+                text: "Second chance sanctuary",
                 icon: (
                   <img
                     src="/icon2.png"
                     alt="Logo"
-                    className="w-[27px] h[27px]"
+                    className="w-[30px] h[30px]"
                   />
                 ),
               },
@@ -226,6 +238,10 @@ const AppContent: React.FC = () => {
                   <Route path="edit/:id" element={<RescueEdit />} />
                   <Route path="show/:id" element={<RescueShow />} />
                 </Route>
+                <Route path="/notifications">
+                  <Route index element={<NotificationList />} />
+                  <Route path="show/:id" element={<NotificationShow />} />
+                </Route>
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>
 
@@ -236,49 +252,7 @@ const AppContent: React.FC = () => {
                   </Authenticated>
                 }
               >
-                <Route
-                  path="/login"
-                  element={
-                    <AuthPage
-                      type="login"
-                      title={
-                        <img
-                          src="/logo2.png"
-                          alt="Logo"
-                          className="w-[320px] h-[75px]"
-                        />
-                      }
-                      registerLink={false}
-                      forgotPasswordLink={false}
-                      // providers={[
-                      //   {
-                      //     name: "google",
-                      //     label: "Sign in with Google",
-                      //     icon: (
-                      //       <GoogleOutlined
-                      //         style={{
-                      //           fontSize: 24,
-                      //           lineHeight: 0,
-                      //         }}
-                      //       />
-                      //     ),
-                      //   },
-                      //   {
-                      //     name: "github",
-                      //     label: "Sign in with GitHub",
-                      //     icon: (
-                      //       <GithubOutlined
-                      //         style={{
-                      //           fontSize: 24,
-                      //           lineHeight: 0,
-                      //         }}
-                      //       />
-                      //     ),
-                      //   },
-                      // ]}
-                    />
-                  }
-                />
+                <Route path="/login" element={<LoginPage />} />
                 {/* <Route path="/register" element={<RegisterPage />} />
                 <Route
                   path="/forgot-password"

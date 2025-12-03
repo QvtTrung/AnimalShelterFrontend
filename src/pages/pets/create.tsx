@@ -15,12 +15,12 @@ export const PetCreate = () => {
   // Mutation for uploading images
   const { mutate: uploadImages, mutation } = useApiMutation("", "post", {
     onSuccess: () => {
-      message.success("Pet and images created successfully");
+      message.success("Đã tạo thú cưng và tải hình ảnh thành công");
       list("pets");
     },
     onError: (error: any) => {
       console.error("Error uploading images:", error);
-      message.error("Failed to upload images");
+      message.error("Tải hình ảnh thất bại");
     },
   });
 
@@ -84,14 +84,14 @@ export const PetCreate = () => {
           values: formData,
         });
       } else {
-        message.success("Pet created successfully");
+        message.success("Đã tạo thú cưng thành công");
         list("pets");
       }
 
       return response;
     } catch (error) {
       console.error("Error creating pet:", error);
-      message.error("Failed to create pet");
+      message.error("Tạo thú cưng thất bại");
       throw error;
     }
   };

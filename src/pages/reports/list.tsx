@@ -92,53 +92,76 @@ export const ReportList = () => {
     setSorters(valid);
   };
 
+  // Status mapping
+  const statusMap: Record<string, string> = {
+    pending: "Chờ xử lý",
+    assigned: "Đã gán",
+    resolved: "Đã giải quyết",
+  };
+
+  // Type mapping
+  const typeMap: Record<string, string> = {
+    abuse: "Bị ngược đãi",
+    abandonment: "Bị bỏ rơi",
+    injured_animal: "Động vật bị thương",
+    other: "Khác",
+  };
+
+  // Urgency mapping
+  const urgencyMap: Record<string, string> = {
+    low: "Thấp",
+    medium: "Trung bình",
+    high: "Cao",
+    critical: "Nghiêm trọng",
+  };
+
   return (
-    <List createButtonProps={{ children: "Create Report" }}>
+    <List title="Báo cáo" createButtonProps={{ children: "Tạo báo cáo" }}>
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}
-          placeholder="Search by title"
+          placeholder="Tìm theo tiêu đề"
           allowClear
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           style={{ width: 240 }}
         />
         <Select
-          placeholder="Status"
+          placeholder="Trạng thái"
           allowClear
           style={{ width: 160 }}
           value={status}
           onChange={handleStatusChange}
           options={[
-            { value: "pending", label: "Pending" },
-            { value: "assigned", label: "Assigned" },
-            { value: "resolved", label: "Resolved" },
+            { value: "pending", label: "Chờ xử lý" },
+            { value: "assigned", label: "Đã gán" },
+            { value: "resolved", label: "Đã giải quyết" },
           ]}
         />
         <Select
-          placeholder="Type"
+          placeholder="Loại"
           allowClear
           style={{ width: 160 }}
           value={type}
           onChange={handleTypeChange}
           options={[
-            { value: "abuse", label: "Abuse" },
-            { value: "abandonment", label: "Abandonment" },
-            { value: "injured_animal", label: "Injured Animal" },
-            { value: "other", label: "Other" },
+            { value: "abuse", label: "Bị ngược đãi" },
+            { value: "abandonment", label: "Bị bỏ rơi" },
+            { value: "injured_animal", label: "Động vật bị thương" },
+            { value: "other", label: "Khác" },
           ]}
         />
         <Select
-          placeholder="Urgency"
+          placeholder="Mức độ khẩn cấp"
           allowClear
           style={{ width: 160 }}
           value={urgency}
           onChange={handleUrgencyChange}
           options={[
-            { value: "low", label: "Low" },
-            { value: "medium", label: "Medium" },
-            { value: "high", label: "High" },
-            { value: "critical", label: "Critical" },
+            { value: "low", label: "Thấp" },
+            { value: "medium", label: "Trung bình" },
+            { value: "high", label: "Cao" },
+            { value: "critical", label: "Nghiêm trọng" },
           ]}
         />
       </Space>
@@ -151,7 +174,7 @@ export const ReportList = () => {
           position: ["bottomCenter"],
           showQuickJumper: true,
           showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+            `${range[0]}-${range[1]} trong tổng số ${total} mục`,
         }}
         onChange={(p, f, s, e) => {
           tableProps.onChange?.(p, f, s, e);
@@ -162,7 +185,7 @@ export const ReportList = () => {
       >
         {/* TITLE */}
         <Table.Column
-          title="Title"
+          title="Tiêu đề"
           dataIndex="title"
           width={150}
           sorter
@@ -183,7 +206,7 @@ export const ReportList = () => {
 
         {/* DESCRIPTION */}
         <Table.Column
-          title="Description"
+          title="Mô tả"
           dataIndex="description"
           width={200}
           ellipsis={{ showTitle: false }}
@@ -202,11 +225,11 @@ export const ReportList = () => {
         />
 
         {/* SPECIES */}
-        <Table.Column title="Species" dataIndex="species" width={100} sorter />
+        <Table.Column title="Loài" dataIndex="species" width={100} sorter />
 
         {/* LOCATION */}
         <Table.Column
-          title="Location"
+          title="Vị trí"
           dataIndex="location"
           width={150}
           ellipsis={{ showTitle: false }}
@@ -227,7 +250,7 @@ export const ReportList = () => {
 
         {/* TYPE */}
         <Table.Column
-          title="Type"
+          title="Loại"
           align="center"
           dataIndex="type"
           width={120}
@@ -239,14 +262,18 @@ export const ReportList = () => {
               injured_animal: "blue",
               other: "gray",
             };
-            return <Tag color={colors[value] || "default"}>{value}</Tag>;
+            return (
+              <Tag color={colors[value] || "default"}>
+                {typeMap[value] || value}
+              </Tag>
+            );
           }}
         />
 
         {/* URGENCY */}
         <Table.Column
           align="center"
-          title="Urgency"
+          title="Mức độ khẩn cấp"
           dataIndex="urgency_level"
           width={100}
           sorter
@@ -257,14 +284,18 @@ export const ReportList = () => {
               medium: "yellow",
               low: "green",
             };
-            return <Tag color={colors[value] || "default"}>{value}</Tag>;
+            return (
+              <Tag color={colors[value] || "default"}>
+                {urgencyMap[value] || value}
+              </Tag>
+            );
           }}
         />
 
         {/* STATUS */}
         <Table.Column
           align="center"
-          title="Status"
+          title="Trạng thái"
           dataIndex="status"
           width={100}
           sorter
@@ -274,13 +305,17 @@ export const ReportList = () => {
               assigned: "blue",
               resolved: "green",
             };
-            return <Tag color={colors[value] || "default"}>{value}</Tag>;
+            return (
+              <Tag color={colors[value] || "default"}>
+                {statusMap[value] || value}
+              </Tag>
+            );
           }}
         />
 
         {/* CREATED */}
         <Table.Column
-          title="Created"
+          title="Ngày tạo"
           dataIndex="date_created"
           width={120}
           sorter
@@ -289,7 +324,7 @@ export const ReportList = () => {
 
         {/* ACTIONS */}
         <Table.Column
-          title="Actions"
+          title="Hành động"
           width={100}
           render={(_, record: any) => (
             <Space>

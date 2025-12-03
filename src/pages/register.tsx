@@ -25,7 +25,6 @@ interface IRegisterForm {
 }
 
 export const RegisterPage: React.FC = () => {
-
   const { mutate: register } = useRegister<IRegisterForm>();
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +42,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Row
         justify="center"
         align="middle"
@@ -54,10 +53,8 @@ export const RegisterPage: React.FC = () => {
         <Col xs={22} sm={16} md={12} lg={8} xl={6}>
           <Card>
             <div style={{ textAlign: "center", marginBottom: "24px" }}>
-              <Title level={3}>Register</Title>
-              <Text type="secondary">
-Create your account
-              </Text>
+              <Title level={3}>Đăng ký</Title>
+              <Text type="secondary">Tạo tài khoản của bạn</Text>
             </div>
             <Form
               name="register"
@@ -68,11 +65,11 @@ Create your account
             >
               <Form.Item
                 name="first_name"
-                label="First Name"
+                label="Tên"
                 rules={[
                   {
                     required: true,
-                    message: "Please input your first name!",
+                    message: "Vui lòng nhập tên của bạn!",
                   },
                 ]}
               >
@@ -81,11 +78,11 @@ Create your account
 
               <Form.Item
                 name="last_name"
-                label="Last Name"
+                label="Họ"
                 rules={[
                   {
                     required: true,
-                    message: "Please input your last name!",
+                    message: "Vui lòng nhập họ của bạn!",
                   },
                 ]}
               >
@@ -106,7 +103,7 @@ Create your account
               </Form.Item>
               <Form.Item
                 name="password"
-                label="Password"
+                label="Mật khẩu"
                 rules={[
                   {
                     required: true,
@@ -122,17 +119,14 @@ Create your account
                   loading={loading}
                   block
                 >
-                  Register
+                  Đăng ký
                 </Button>
               </Form.Item>
             </Form>
             <Divider />
             <div style={{ textAlign: "center" }}>
               <Text type="secondary">
-Already have an account?{" "}
-                <Link to="/login">
-                  Sign in
-                </Link>
+                Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
               </Text>
             </div>
           </Card>

@@ -117,6 +117,20 @@ export const RescueShow = () => {
     }
   };
 
+  // Vietnamese mappings
+  const statusMap: Record<string, string> = {
+    planned: "Đã lên kế hoạch",
+    in_progress: "Đang thực hiện",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+  };
+
+  const reportStatusMap: Record<string, string> = {
+    pending: "Chờ xử lý",
+    assigned: "Đã gán",
+    resolved: "Đã giải quyết",
+  };
+
   const getReportDetails = (reportId: string) =>
     reportData.find((r) => r.id === reportId);
 
@@ -134,13 +148,15 @@ export const RescueShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Rescue campaign started successfully!");
+          message.success("Đã bắt đầu chiến dịch cứu hộ thành công!");
           queryResult.refetch();
           setIsStartModalVisible(false);
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to start rescue");
+          message.error(
+            error?.message || "Không thể bắt đầu chiến dịch cứu hộ"
+          );
           setLoading(false);
         },
       }
@@ -157,14 +173,14 @@ export const RescueShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Rescue cancelled successfully!");
+          message.success("Đã hủy chiến dịch cứu hộ thành công!");
           queryResult.refetch();
           setIsCancelModalVisible(false);
           setCancelReason("");
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to cancel rescue");
+          message.error(error?.message || "Không thể hủy chiến dịch cứu hộ");
           setLoading(false);
         },
       }
@@ -182,14 +198,16 @@ export const RescueShow = () => {
       {
         onSuccess: () => {
           message.success(
-            "Rescue completed successfully! Reports have been updated."
+            "Đã hoàn tất chiến dịch cứu hộ thành công! Báo cáo đã được cập nhật."
           );
           queryResult.refetch();
           setIsCompleteModalVisible(false);
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to complete rescue");
+          message.error(
+            error?.message || "Không thể hoàn tất chiến dịch cứu hộ"
+          );
           setLoading(false);
         },
       }
@@ -230,7 +248,7 @@ export const RescueShow = () => {
                 <Space>
                   <FileTextOutlined className="text-blue-500" />
                   <Title level={4} className="m-0!">
-                    Rescue Information
+                    Thông tin chiến dịch cứu hộ
                   </Title>
                 </Space>
               }
@@ -241,31 +259,32 @@ export const RescueShow = () => {
               <div className="px-2 sm:px-3 overflow-y-auto h-full">
                 <Space direction="vertical" className="w-full">
                   <Space className="flex flex-wrap">
-                    <Text strong>Title:</Text>
+                    <Text strong>Tiêu đề:</Text>
                     <Text>{record?.title}</Text>
                     <Tag color={getStatusColor(record?.status ?? "")}>
-                      {record?.status?.toUpperCase()}
+                      {statusMap[record?.status || ""] ||
+                        record?.status?.toUpperCase()}
                     </Tag>
                   </Space>
 
                   <Text>
-                    <strong>Description:</strong> {record?.description}
+                    <strong>Mô tả:</strong> {record?.description}
                   </Text>
 
                   <Text>
-                    <strong>Required Participants:</strong>{" "}
+                    <strong>Thành viên cần thiết:</strong>{" "}
                     {record?.required_participants}
                   </Text>
 
                   <Text>
-                    <strong>Created:</strong>{" "}
+                    <strong>Ngày tạo:</strong>{" "}
                     {record?.date_created
                       ? new Date(record.date_created).toLocaleString()
                       : "N/A"}
                   </Text>
 
                   <Text>
-                    <strong>Last Updated:</strong>{" "}
+                    <strong>Cập nhật lần cuối:</strong>{" "}
                     {record?.date_updated
                       ? new Date(record.date_updated).toLocaleString()
                       : "N/A"}
@@ -285,7 +304,7 @@ export const RescueShow = () => {
                           block
                           size="large"
                         >
-                          Start Rescue Campaign
+                          Bắt đầu chiến dịch cứu hộ
                         </Button>
                         <Button
                           danger
@@ -295,7 +314,7 @@ export const RescueShow = () => {
                           block
                           size="large"
                         >
-                          Cancel Rescue
+                          Hủy chiến dịch cứu hộ
                         </Button>
                       </>
                     )}
@@ -309,7 +328,7 @@ export const RescueShow = () => {
                         block
                         size="large"
                       >
-                        Complete Rescue
+                        Hoàn tất chiến dịch cứu hộ
                       </Button>
                     )}
 
@@ -317,10 +336,10 @@ export const RescueShow = () => {
                       <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
                         <CheckCircleOutlined className="text-4xl text-green-600 mb-2" />
                         <Title level={5} className="mb-1! text-gray-800">
-                          Rescue Completed
+                          Đã hoàn thành chiến dịch cứu hộ
                         </Title>
                         <Text className="text-gray-700">
-                          This rescue campaign has been completed
+                          Chiến dịch cứu hộ này đã hoàn thành
                         </Text>
                       </div>
                     )}
@@ -329,15 +348,15 @@ export const RescueShow = () => {
                       <div className="border border-gray-300 bg-gray-50 rounded-lg p-4 text-center">
                         <StopOutlined className="text-4xl text-red-600 mb-2" />
                         <Title level={5} className="mb-1! text-gray-800">
-                          Rescue Cancelled
+                          Đã hủy chiến dịch cứu hộ
                         </Title>
                         <Text className="text-gray-700">
-                          This rescue campaign has been cancelled
+                          Chiến dịch cứu hộ này đã bị hủy
                         </Text>
                         {record?.cancellation_reason && (
                           <div className="mt-2 pt-2 border-t border-gray-300">
                             <Text className="text-sm text-gray-600">
-                              <strong>Reason:</strong>{" "}
+                              <strong>Lý do:</strong>{" "}
                               {record.cancellation_reason}
                             </Text>
                           </div>
@@ -348,7 +367,7 @@ export const RescueShow = () => {
 
                   <Divider className="my-3" />
 
-                  <Title level={5}>Connected Reports</Title>
+                  <Title level={5}>Báo cáo liên kết</Title>
                   <div className="overflow-y-auto">
                     <List
                       dataSource={record?.reports ?? []}
@@ -365,7 +384,7 @@ export const RescueShow = () => {
                           return (
                             <List.Item>
                               <Text type="secondary">
-                                Report data not loaded
+                                Chưa tải dữ liệu báo cáo
                               </Text>
                             </List.Item>
                           );
@@ -405,7 +424,7 @@ export const RescueShow = () => {
                               }
                               description={
                                 <Text type="secondary">
-                                  Urgency: {report.urgency_level} •{" "}
+                                  Mức độ khẩn cấp: {report.urgency_level} •{" "}
                                   {report.location}
                                 </Text>
                               }
@@ -413,7 +432,7 @@ export const RescueShow = () => {
                           </List.Item>
                         );
                       }}
-                      locale={{ emptyText: "No reports included yet" }}
+                      locale={{ emptyText: "Chưa có báo cáo nào" }}
                     />
                   </div>
                 </Space>
@@ -430,7 +449,7 @@ export const RescueShow = () => {
                 <Space>
                   <TeamOutlined className="text-purple-500" />
                   <Title level={4} className="m-0!">
-                    Participants
+                    Thành viên
                   </Title>
                   <Tag color="blue" className="text-base px-3 py-1">
                     {record?.participants?.length ?? 0} /{" "}
@@ -484,7 +503,7 @@ export const RescueShow = () => {
                     </List.Item>
                   );
                 }}
-                locale={{ emptyText: "No participants yet" }}
+                locale={{ emptyText: "Chưa có thành viên" }}
               />
             </Card>
           </Col>
@@ -507,7 +526,7 @@ export const RescueShow = () => {
 
       {/* ----------------------- CANCEL MODAL ------------------------------ */}
       <Modal
-        title="Cancel Rescue"
+        title="Hủy chiến dịch cứu hộ"
         open={isCancelModalVisible}
         onOk={handleCancelRescue}
         onCancel={() => {
@@ -515,16 +534,16 @@ export const RescueShow = () => {
           setCancelReason("");
         }}
         confirmLoading={loading}
-        okText="Cancel Rescue"
+        okText="Hủy chiến dịch"
         okButtonProps={{ danger: true }}
       >
-        <p>Are you sure you want to cancel this rescue campaign?</p>
+        <p>Bạn có chắc chắn muốn hủy chiến dịch cứu hộ này không?</p>
         <p className="text-gray-500 text-sm mb-4">
-          All assigned reports will be returned to pending status.
+          Tất cả các báo cáo đã gán sẽ được trả về trạng thái chờ xử lý.
         </p>
         <Input.TextArea
           rows={4}
-          placeholder="Reason for cancellation (optional)"
+          placeholder="Lý do hủy (tùy chọn)"
           value={cancelReason}
           onChange={(e) => setCancelReason(e.target.value)}
         />
@@ -535,29 +554,29 @@ export const RescueShow = () => {
         title={
           <span className="text-lg font-semibold">
             <PlayCircleOutlined className="mr-2 text-blue-500" />
-            Start Rescue Campaign
+            Bắt đầu chiến dịch cứu hộ
           </span>
         }
         open={isStartModalVisible}
         onOk={handleStartRescue}
         onCancel={() => setIsStartModalVisible(false)}
         confirmLoading={loading}
-        okText="Start Rescue"
+        okText="Bắt đầu"
         okButtonProps={{ type: "primary", size: "large" }}
         cancelButtonProps={{ size: "large" }}
       >
         <div className="py-4">
           <p className="text-base mb-3">
-            Are you sure you want to start this rescue campaign?
+            Bạn có chắc chắn muốn bắt đầu chiến dịch cứu hộ này không?
           </p>
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
             <p className="text-sm text-gray-700">
-              <strong>This will:</strong>
+              <strong>Hành động này sẽ:</strong>
             </p>
             <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
-              <li>Change the rescue status to "In Progress"</li>
-              <li>Notify all participants</li>
-              <li>Activate the progress tracker</li>
+              <li>Thay đổi trạng thái chiến dịch thành "Đang thực hiện"</li>
+              <li>Thông báo cho tất cả thành viên</li>
+              <li>Kích hoạt bộ theo dõi tiến độ</li>
             </ul>
           </div>
         </div>
@@ -568,30 +587,30 @@ export const RescueShow = () => {
         title={
           <span className="text-lg font-semibold">
             <CheckCircleOutlined className="mr-2 text-green-500" />
-            Complete Rescue Campaign
+            Hoàn tất chiến dịch cứu hộ
           </span>
         }
         open={isCompleteModalVisible}
         onOk={handleCompleteRescue}
         onCancel={() => setIsCompleteModalVisible(false)}
         confirmLoading={loading}
-        okText="Complete Rescue"
+        okText="Hoàn tất"
         okButtonProps={{ type: "primary", size: "large" }}
         cancelButtonProps={{ size: "large" }}
       >
         <div className="py-4">
           <p className="text-base mb-3">
-            Are you sure you want to complete this rescue campaign?
+            Bạn có chắc chắn muốn hoàn tất chiến dịch cứu hộ này không?
           </p>
           <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
             <p className="text-sm text-gray-700">
-              <strong>This will:</strong>
+              <strong>Hành động này sẽ:</strong>
             </p>
             <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
-              <li>Mark the rescue as "Completed"</li>
-              <li>Update all successful reports to "Resolved"</li>
-              <li>Return cancelled/incomplete reports to "Pending"</li>
-              <li>Notify all participants of completion</li>
+              <li>Đánh dấu chiến dịch là "Hoàn thành"</li>
+              <li>Cập nhật tất cả báo cáo thành công thành "Giải quyết"</li>
+              <li>Trả lại báo cáo bị hủy/chưa hoàn thành về "Chờ xử lý"</li>
+              <li>Thông báo cho tất cả thành viên về việc hoàn thành</li>
             </ul>
           </div>
         </div>

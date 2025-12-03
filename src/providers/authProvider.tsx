@@ -150,73 +150,11 @@ export const authProvider: AuthProvider = {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // Optionally: verify token validity by making a request to /auth/me
-      // This ensures the token is still valid on the backend
-      try {
-        await axiosInstance.get("/auth/me");
-        return {
-          authenticated: true,
-        };
-      } catch (error: any) {
-        // If the token is invalid and refresh fails, the interceptor will handle it
-        if (error?.response?.status === 401) {
-          // Try to refresh the token one more time
-          try {
-            const response = await axiosInstance.post("/auth/refresh");
-            const {
-              directusUser,
-              user,
-              token: newToken,
-              refresh_token,
-            } = response.data.data;
-
-            if (newToken) {
-              localStorage.setItem("token", newToken);
-
-              // Store refresh token if provided
-              if (refresh_token) {
-                localStorage.setItem("refresh_token", refresh_token);
-              }
-
-              if (directusUser) {
-                localStorage.setItem(
-                  "directusUser",
-                  JSON.stringify(directusUser)
-                );
-              }
-
-              if (user) {
-                localStorage.setItem("appUser", JSON.stringify(user));
-              }
-
-              return {
-                authenticated: true,
-              };
-            }
-          } catch (refreshError) {
-            console.error("Token refresh failed in check:", refreshError);
-            // Clear storage and redirect to login
-            localStorage.removeItem("token");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("directusUser");
-            localStorage.removeItem("appUser");
-
-            return {
-              authenticated: false,
-              error: {
-                name: "Session expired",
-                message: "Your session has expired. Please login again.",
-              },
-              logout: true,
-              redirectTo: "/login",
-            };
-          }
-        }
-
-        return {
-          authenticated: true,
-        };
-      }
+      // Token exists, assume authenticated
+      // The axios interceptor will handle token refresh if needed
+      return {
+        authenticated: true,
+      };
     }
 
     return {
@@ -298,7 +236,6 @@ export const authProvider: AuthProvider = {
         timezone: directusUser.timezone || "UTC",
       };
 
-      console.log("getIdentity - returning identity:", identity);
       return identity;
     }
 

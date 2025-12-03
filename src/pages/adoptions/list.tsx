@@ -66,25 +66,35 @@ export const AdoptionList = () => {
     }
   };
 
+  // Status mapping
+  const statusMap: Record<string, string> = {
+    pending: "Chờ xử lý",
+    confirming: "Đang xác nhận",
+    confirmed: "Đã xác nhận",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+  };
+
   return (
     <List
+      title="Nhận nuôi"
       createButtonProps={{
-        children: "Create Adoption",
+        children: "Tạo Đơn nhận nuôi",
       }}
     >
       <Space wrap style={{ marginBottom: 16 }}>
         <Select
-          placeholder="Filter by Status"
+          placeholder="Lọc theo trạng thái"
           allowClear
           style={{ width: 160 }}
           value={status}
           onChange={(v) => handleStatusChange(v as string | undefined)}
           options={[
-            { value: "pending", label: "Pending" },
-            { value: "confirming", label: "Confirming" },
-            { value: "confirmed", label: "Confirmed" },
-            { value: "completed", label: "Completed" },
-            { value: "cancelled", label: "Cancelled" },
+            { value: "pending", label: "Chờ xử lý" },
+            { value: "confirming", label: "Đang xác nhận" },
+            { value: "confirmed", label: "Đã xác nhận" },
+            { value: "completed", label: "Hoàn thành" },
+            { value: "cancelled", label: "Đã hủy" },
           ]}
         />
       </Space>
@@ -110,12 +120,12 @@ export const AdoptionList = () => {
           ...tableProps.pagination,
           position: ["bottomCenter"],
           showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+            `${range[0]}-${range[1]} trong ${total} mục`,
         }}
       >
         <Table.Column
           dataIndex={["pet_id", "name"]}
-          title="Pet Name"
+          title="Tên thú cưng"
           render={(value, record: IAdoption) => {
             const pet =
               typeof record.pet_id === "object" ? record.pet_id : null;
@@ -124,7 +134,7 @@ export const AdoptionList = () => {
         />
         <Table.Column
           dataIndex={["pet_id", "species"]}
-          title="Species"
+          title="Loài"
           render={(value, record: IAdoption) => {
             const pet =
               typeof record.pet_id === "object" ? record.pet_id : null;
@@ -133,7 +143,7 @@ export const AdoptionList = () => {
         />
         <Table.Column
           dataIndex={["pet_id", "status"]}
-          title="Pet Status"
+          title="Trạng thái thú cưng"
           render={(value, record: IAdoption) => {
             const pet =
               typeof record.pet_id === "object" ? record.pet_id : null;
@@ -143,12 +153,24 @@ export const AdoptionList = () => {
             else if (status === "pending") color = "orange";
             else if (status === "adopted") color = "blue";
 
-            return status ? <Tag color={color}>{status}</Tag> : "-";
+            // Pet status mapping
+            const petStatusMap: Record<string, string> = {
+              available: "Có sẵn",
+              pending: "Chờ xử lý",
+              adopted: "Đã nhận nuôi",
+              archived: "Đã lưu trữ",
+            };
+
+            return status ? (
+              <Tag color={color}>{petStatusMap[status] || status}</Tag>
+            ) : (
+              "-"
+            );
           }}
         />
         <Table.Column
           dataIndex={["user_id", "first_name"]}
-          title="Adopter"
+          title="Người nhận nuôi"
           render={(_, record: IAdoption) => {
             const user =
               typeof record.user_id === "object" ? record.user_id : null;
@@ -169,14 +191,16 @@ export const AdoptionList = () => {
         />
         <Table.Column
           dataIndex="status"
-          title="Adoption Status"
+          title="Trạng thái nhận nuôi"
           render={(value) => (
-            <Tag color={getStatusColor(value)}>{value?.toUpperCase()}</Tag>
+            <Tag color={getStatusColor(value)}>
+              {statusMap[value] || value?.toUpperCase()}
+            </Tag>
           )}
         />
         <Table.Column
           dataIndex="appointment_date"
-          title="Appointment"
+          title="Ngày hẹn"
           sorter
           render={(value) =>
             value ? new Date(value).toLocaleDateString() : "-"
@@ -184,14 +208,14 @@ export const AdoptionList = () => {
         />
         <Table.Column
           dataIndex="date_created"
-          title="Request Date"
+          title="Ngày yêu cầu"
           sorter
           render={(value) =>
             value ? new Date(value).toLocaleDateString() : "-"
           }
         />
         <Table.Column
-          title="Actions"
+          title="Thao tác"
           dataIndex="actions"
           render={(_, record: IAdoption) => (
             <Space>

@@ -345,44 +345,40 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       layout="vertical"
       onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
     >
-      <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-        <Input placeholder="Enter report title" />
+      <Form.Item label="Tiêu đề" name="title" rules={[{ required: true }]}>
+        <Input placeholder="Nhập tiêu đề báo cáo" />
       </Form.Item>
 
-      <Form.Item
-        label="Description"
-        name="description"
-        rules={[{ required: true }]}
-      >
-        <Input.TextArea rows={4} placeholder="Describe the issue" />
+      <Form.Item label="Mô tả" name="description" rules={[{ required: true }]}>
+        <Input.TextArea rows={4} placeholder="Mô tả vấn đề" />
       </Form.Item>
 
-      <Form.Item label="Species" name="species" rules={[{ required: true }]}>
-        <Input placeholder="e.g. Dog, Cat, Bird" />
+      <Form.Item label="Loài" name="species" rules={[{ required: true }]}>
+        <Input placeholder="Ví dụ: Chó, Mèo, Chim" />
       </Form.Item>
 
-      <Form.Item label="Type" name="type" rules={[{ required: true }]}>
+      <Form.Item label="Loại" name="type" rules={[{ required: true }]}>
         <Select
           options={[
-            { label: "Abuse", value: "abuse" },
-            { label: "Abandonment", value: "abandonment" },
-            { label: "Injured Animal", value: "injured_animal" },
-            { label: "Other", value: "other" },
+            { label: "Lạm dụng", value: "abuse" },
+            { label: "Bỏ rơi", value: "abandonment" },
+            { label: "Động vật bị thương", value: "injured_animal" },
+            { label: "Khác", value: "other" },
           ]}
         />
       </Form.Item>
 
       <Form.Item
-        label="Urgency Level"
+        label="Mức độ khẩn cấp"
         name="urgency_level"
         rules={[{ required: true }]}
       >
         <Select
           options={[
-            { label: "Low", value: "low" },
-            { label: "Medium", value: "medium" },
-            { label: "High", value: "high" },
-            { label: "Critical", value: "critical" },
+            { label: "Thấp", value: "low" },
+            { label: "Trung bình", value: "medium" },
+            { label: "Cao", value: "high" },
+            { label: "Nghiêm trọng", value: "critical" },
           ]}
         />
       </Form.Item>
@@ -390,9 +386,9 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         <Input type="hidden" />
       </Form.Item>
       <Form.Item
-        label="Location"
+        label="Vị trí"
         name="coordinates"
-        rules={[{ required: true, message: "Please select a location" }]}
+        rules={[{ required: true, message: "Vui lòng chọn vị trí" }]}
       >
         <LocationPicker
           locationText={locText}
@@ -400,23 +396,23 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         />
       </Form.Item>
 
-      <Form.Item label="Report Images">
+      <Form.Item label="Hình ảnh báo cáo">
         <Upload.Dragger {...uploadProps}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">
-            Click or drag file to this area to upload
+            Nhấp hoặc kéo tệp vào khu vực này để tải lên
           </p>
           <p className="ant-upload-hint">
-            Support for a single or bulk upload.
+            Hỗ trợ tải lên đơn lẻ hoặc nhiều tệp.
           </p>
         </Upload.Dragger>
 
         {/* Existing Images (edit mode) */}
         {existingImages.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <h4>Existing Images:</h4>
+            <h4>Hình ảnh hiện có:</h4>
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
               dataSource={existingImages}
@@ -430,7 +426,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
                       style={{ objectFit: "cover" }}
                     />
                     <Popconfirm
-                      title="Delete this image?"
+                      title="Xóa hình ảnh này?"
                       onConfirm={() => handleDeleteImage(item.id)}
                     >
                       <Button
@@ -439,7 +435,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
                         icon={<DeleteOutlined />}
                         size="small"
                       >
-                        Delete
+                        Xóa
                       </Button>
                     </Popconfirm>
                   </Space>
@@ -452,7 +448,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
         {/* FileList (create mode) */}
         {fileList.length > 0 && !reportId && (
           <div style={{ marginTop: 16 }}>
-            <h4>Images to upload:</h4>
+            <h4>Hình ảnh sẽ tải lên:</h4>
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
               dataSource={fileList}
@@ -473,7 +469,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
                         setFileList(fileList.filter((f) => f !== file))
                       }
                     >
-                      Remove
+                      Gỡ
                     </Button>
                   </Space>
                 </List.Item>
@@ -489,7 +485,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           htmlType="submit"
           loading={uploadingProp || uploading || mutation?.status === "pending"}
         >
-          Save
+          Lưu
         </Button>
       </Form.Item>
     </Form>

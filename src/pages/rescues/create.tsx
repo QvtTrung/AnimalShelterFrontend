@@ -21,11 +21,11 @@ export const RescueCreate = () => {
   // Mutation for creating rescue
   const createRescue = useApiMutation("", "", {
     onSuccess: () => {
-      message.success("Rescue created successfully");
+      message.success("Đã tạo chiến dịch cứu hộ thành công");
     },
     onError: (error: any) => {
       console.error("Error creating rescue:", error);
-      message.error("Failed to create rescue");
+      message.error("Không thể tạo chiến dịch cứu hộ");
     },
   });
 
@@ -33,7 +33,7 @@ export const RescueCreate = () => {
   const addParticipant = useApiMutation("", "", {
     onError: (error: any) => {
       console.error("Error adding participant:", error);
-      message.error("Failed to add participant");
+      message.error("Không thể thêm thành viên");
     },
   });
 
@@ -41,7 +41,7 @@ export const RescueCreate = () => {
   const addReport = useApiMutation("", "", {
     onError: (error: any) => {
       console.error("Error adding report:", error);
-      message.error("Failed to add report");
+      message.error("Không thể thêm báo cáo");
     },
   });
 
@@ -93,13 +93,13 @@ export const RescueCreate = () => {
         }
       }
 
-      message.success("Rescue and all associations created successfully");
+      message.success("Đã tạo chiến dịch cứu hộ và các liên kết thành công");
 
       // Redirect to list page using Refine's navigation
       list("rescues");
     } catch (error) {
       console.error("Error creating rescue:", error);
-      message.error("Failed to create rescue");
+      message.error("Không thể tạo chiến dịch cứu hộ");
     }
   };
 

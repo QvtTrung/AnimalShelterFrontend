@@ -68,6 +68,22 @@ export const AdoptionShow = () => {
     }
   };
 
+  // Vietnamese mappings
+  const statusMap: Record<string, string> = {
+    pending: "Chờ xử lý",
+    confirming: "Đang xác nhận",
+    confirmed: "Đã xác nhận",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+  };
+
+  const petStatusMap: Record<string, string> = {
+    available: "Có sẵn",
+    pending: "Chờ xử lý",
+    adopted: "Đã nhận nuôi",
+    archived: "Đã lưu trữ",
+  };
+
   const handleSendConfirmation = () => {
     setLoading(true);
     sendConfirmation(
@@ -78,12 +94,12 @@ export const AdoptionShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Confirmation email sent successfully!");
+          message.success("Đã gử3i email xác nhận thành công!");
           queryResult.refetch();
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to send confirmation");
+          message.error(error?.message || "Gửi email xác nhận thất bại");
           setLoading(false);
         },
       }
@@ -100,12 +116,12 @@ export const AdoptionShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Adoption confirmed successfully!");
+          message.success("Đã xác nhận nhận nuôi thành công!");
           queryResult.refetch();
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to confirm adoption");
+          message.error(error?.message || "Xác nhận nhận nuôi thất bại");
           setLoading(false);
         },
       }
@@ -122,12 +138,12 @@ export const AdoptionShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Adoption cancelled successfully!");
+          message.success("Đã hủy nhận nuôi thành công!");
           queryResult.refetch();
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to cancel adoption");
+          message.error(error?.message || "Hủy nhận nuôi thất bại");
           setLoading(false);
         },
       }
@@ -144,12 +160,12 @@ export const AdoptionShow = () => {
       },
       {
         onSuccess: () => {
-          message.success("Adoption completed successfully!");
+          message.success("Đã hoàn tất nhận nuôi thành công!");
           queryResult.refetch();
           setLoading(false);
         },
         onError: (error: any) => {
-          message.error(error?.message || "Failed to complete adoption");
+          message.error(error?.message || "Hoàn tất nhận nuôi thất bại");
           setLoading(false);
         },
       }
@@ -161,13 +177,13 @@ export const AdoptionShow = () => {
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
 
-        <Descriptions.Item label="Pet Name">
+        <Descriptions.Item label="Tên thú cưng">
           {pet?.name || "-"}
         </Descriptions.Item>
-        <Descriptions.Item label="Pet Species">
+        <Descriptions.Item label="Loài">
           {pet?.species || "-"}
         </Descriptions.Item>
-        <Descriptions.Item label="Pet Status">
+        <Descriptions.Item label="Trạng thái thú cưng">
           {pet?.status ? (
             <Tag
               color={
@@ -178,62 +194,62 @@ export const AdoptionShow = () => {
                   : "blue"
               }
             >
-              {pet.status.toUpperCase()}
+              {petStatusMap[pet.status] || pet.status.toUpperCase()}
             </Tag>
           ) : (
             "-"
           )}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Adopter Name">
+        <Descriptions.Item label="Tên người nhận nuôi">
           {user
             ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
             : "-"}
         </Descriptions.Item>
-        <Descriptions.Item label="Adopter Email">
+        <Descriptions.Item label="Email người nhận nuôi">
           {user?.email || "-"}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Adoption Status">
+        <Descriptions.Item label="Trạng thái nhận nuôi">
           <Tag color={getStatusColor(record?.status || "")}>
-            {record?.status?.toUpperCase()}
+            {statusMap[record?.status || ""] || record?.status?.toUpperCase()}
           </Tag>
         </Descriptions.Item>
 
-        <Descriptions.Item label="Appointment Date">
+        <Descriptions.Item label="Ngày hẹn">
           {record?.appointment_date
             ? new Date(record.appointment_date).toLocaleString()
             : "-"}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Approval Date">
+        <Descriptions.Item label="Ngày phê duyệt">
           {record?.approval_date
             ? new Date(record.approval_date).toLocaleDateString()
             : "-"}
         </Descriptions.Item>
 
         {record?.confirmation_sent_at && (
-          <Descriptions.Item label="Confirmation Sent">
+          <Descriptions.Item label="Gửi xác nhận lúc">
             {new Date(record.confirmation_sent_at).toLocaleString()}
           </Descriptions.Item>
         )}
 
         {record?.confirmation_expires_at && (
-          <Descriptions.Item label="Confirmation Expires">
+          <Descriptions.Item label="Xác nhận hết hạn lúc">
             {new Date(record.confirmation_expires_at).toLocaleString()}
           </Descriptions.Item>
         )}
 
-        <Descriptions.Item label="Notes">
+        <Descriptions.Item label="Ghi chú">
           {record?.notes || "-"}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Date Created">
+        <Descriptions.Item label="Ngày tạo">
           {record?.date_created
             ? new Date(record.date_created).toLocaleString()
             : "N/A"}
         </Descriptions.Item>
-        <Descriptions.Item label="Date Updated">
+        <Descriptions.Item label="Ngày cập nhật">
           {record?.date_updated
             ? new Date(record.date_updated).toLocaleString()
             : "N/A"}
@@ -244,14 +260,14 @@ export const AdoptionShow = () => {
         <Space>
           {record?.status === "pending" && (
             <Popconfirm
-              title="Send Confirmation Request"
-              description="This will change the pet status to 'pending' and send a confirmation email to the user."
+              title="Gửi Yêu cầu Xác nhận"
+              description="Hành động này sẽ thay đổi trạng thái thú cưng thành 'chờ xử lý' và gửi email xác nhận cho người dùng."
               onConfirm={handleSendConfirmation}
-              okText="Yes"
-              cancelText="No"
+              okText="Có"
+              cancelText="Không"
             >
               <Button type="primary" icon={<SendOutlined />} loading={loading}>
-                Send Confirmation Request
+                Gửi Yêu cầu Xác nhận
               </Button>
             </Popconfirm>
           )}
@@ -259,11 +275,11 @@ export const AdoptionShow = () => {
           {record?.status === "confirming" && (
             <>
               <Popconfirm
-                title="Confirm Adoption"
-                description="This will change the adoption status to 'confirmed'."
+                title="Xác nhận Nhận nuôi"
+                description="Hành động này sẽ thay đổi trạng thái nhận nuôi thành 'đã xác nhận'."
                 onConfirm={handleConfirm}
-                okText="Yes"
-                cancelText="No"
+                okText="Có"
+                cancelText="Không"
               >
                 <Button
                   type="primary"
@@ -271,19 +287,19 @@ export const AdoptionShow = () => {
                   loading={loading}
                   style={{ backgroundColor: "#52c41a" }}
                 >
-                  Confirm Adoption
+                  Xác nhận Nhận nuôi
                 </Button>
               </Popconfirm>
 
               <Popconfirm
-                title="Cancel Adoption"
-                description="This will cancel the adoption and return the pet to 'available' status."
+                title="Hủy Nhận nuôi"
+                description="Hành động này sẽ hủy nhận nuôi và trả trạng thái thú cưng về 'có sẵn'."
                 onConfirm={handleCancel}
-                okText="Yes"
-                cancelText="No"
+                okText="Có"
+                cancelText="Không"
               >
                 <Button danger icon={<CloseOutlined />} loading={loading}>
-                  Cancel Adoption
+                  Hủy Nhận nuôi
                 </Button>
               </Popconfirm>
             </>
@@ -292,11 +308,11 @@ export const AdoptionShow = () => {
           {record?.status === "confirmed" && (
             <>
               <Popconfirm
-                title="Complete Adoption"
-                description="This will mark the adoption as completed and change the pet status to 'adopted'."
+                title="Hoàn tất Nhận nuôi"
+                description="Hành động này sẽ đánh dấu nhận nuôi hoàn tất và thay đổi trạng thái thú cưng thành 'đã nhận nuôi'."
                 onConfirm={handleComplete}
-                okText="Yes"
-                cancelText="No"
+                okText="Có"
+                cancelText="Không"
               >
                 <Button
                   type="primary"
@@ -304,19 +320,19 @@ export const AdoptionShow = () => {
                   loading={loading}
                   style={{ backgroundColor: "#13c2c2" }}
                 >
-                  Complete Adoption
+                  Hoàn tất Nhận nuôi
                 </Button>
               </Popconfirm>
 
               <Popconfirm
-                title="Cancel Adoption"
-                description="This will cancel the adoption and return the pet to 'available' status."
+                title="Hủy Nhận nuôi"
+                description="Hành động này sẽ hủy nhận nuôi và trả trạng thái thú cưng về 'có sẵn'."
                 onConfirm={handleCancel}
-                okText="Yes"
-                cancelText="No"
+                okText="Có"
+                cancelText="Không"
               >
                 <Button danger icon={<CloseOutlined />} loading={loading}>
-                  Cancel Adoption
+                  Hủy Nhận nuôi
                 </Button>
               </Popconfirm>
             </>

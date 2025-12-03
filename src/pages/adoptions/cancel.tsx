@@ -42,7 +42,7 @@ export const AdoptionCancel = () => {
     return (
       <div style={{ textAlign: "center", padding: "100px 20px" }}>
         <Spin size="large" />
-        <p style={{ marginTop: 20 }}>Processing your cancellation...</p>
+        <p style={{ marginTop: 20 }}>Đang xử lý yêu cầu hủy của bạn...</p>
       </div>
     );
   }
@@ -52,11 +52,11 @@ export const AdoptionCancel = () => {
       <Result
         status="warning"
         icon={<ExclamationCircleOutlined style={{ color: "#faad14" }} />}
-        title="Adoption Cancelled"
-        subTitle="Your adoption request has been cancelled. The pet is now available for other adopters. If you change your mind, you can submit a new adoption request."
+        title="Đã Hủy Nhận nuôi"
+        subTitle="Yêu cầu nhận nuôi của bạn đã bị hủy. Thú cưng hiện đã có sẵn cho người nhận nuôi khác. Nếu bạn thay đổi ý định, bạn có thể gửi yêu cầu nhận nuôi mới."
         extra={[
           <Button type="primary" key="home" onClick={() => navigate("/")}>
-            Go to Home
+            Về Trang chủ
           </Button>,
         ]}
       />
@@ -67,14 +67,14 @@ export const AdoptionCancel = () => {
     <Result
       status="error"
       icon={<CloseCircleOutlined style={{ color: "#ff4d4f" }} />}
-      title="Cancellation Failed"
+      title="Hủy Thất bại"
       subTitle={
         errorMessage ||
-        "We couldn't cancel your adoption request. Please contact support for assistance."
+        "Chúng tôi không thể hủy yêu cầu nhận nuôi của bạn. Vui lòng liên hệ hỗ trợ để được trợ giúp."
       }
       extra={[
         <Button type="primary" key="home" onClick={() => navigate("/")}>
-          Go to Home
+          Về Trang chủ
         </Button>,
       ]}
     />

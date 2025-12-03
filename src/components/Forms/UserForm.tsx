@@ -27,9 +27,9 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
   // Use predefined role names
   useEffect(() => {
     setRoles([
-      { id: "User", name: "User" },
-      { id: "Staff", name: "Staff" },
-      { id: "Administrator", name: "Administrator" },
+      { id: "User", name: "Người dùng" },
+      { id: "Staff", name: "Nhân viên" },
+      { id: "Administrator", name: "Quản trị viên" },
     ]);
   }, []);
 
@@ -53,23 +53,23 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
         <Input />
       </Form.Item>
       <Form.Item
-        label="Password"
+        label="Mật khẩu"
         name="password"
         rules={[
           {
             required: !id,
             min: 6,
-            message: "Password must be at least 6 characters",
+            message: "Mật khẩu phải có ít nhất 6 ký tự",
           },
         ]}
-        help={id ? "Leave blank to keep current password" : ""}
+        help={id ? "Để trống để giữ mật khẩu hiện tại" : ""}
       >
         <Input.Password
-          placeholder={id ? "Leave blank to keep current password" : ""}
+          placeholder={id ? "Để trống để giữ mật khẩu hiện tại" : ""}
         />
       </Form.Item>
       <Form.Item
-        label="First Name"
+        label="Tên"
         name="first_name"
         rules={[
           {
@@ -80,7 +80,7 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
         <Input />
       </Form.Item>
       <Form.Item
-        label="Last Name"
+        label="Họ"
         name="last_name"
         rules={[
           {
@@ -90,24 +90,24 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
       >
         <Input />
       </Form.Item>
-      <Form.Item label="Phone Number" name="phone_number">
+      <Form.Item label="Số điện thoại" name="phone_number">
         <Input />
       </Form.Item>
-      <Form.Item label="Address" name="address">
+      <Form.Item label="Địa chỉ" name="address">
         <Input.TextArea rows={4} />
       </Form.Item>
       <Form.Item
-        label="Role"
+        label="Vai trò"
         name="role"
         rules={[
           {
             required: true,
-            message: "Please select a role",
+            message: "Vui lòng chọn vai trò",
           },
         ]}
       >
         <Select
-          placeholder="Select a role"
+          placeholder="Chọn vai trò"
           options={roles.map((role) => ({
             label: role.name,
             value: role.id,
@@ -115,7 +115,7 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
         />
       </Form.Item>
       <Form.Item
-        label="Status"
+        label="Trạng thái"
         name="status"
         rules={[
           {
@@ -126,11 +126,11 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
         <Select
           options={[
             {
-              label: "Active",
+              label: "Hoạt động",
               value: "active",
             },
             {
-              label: "Inactive",
+              label: "Không hoạt động",
               value: "inactive",
             },
           ]}
@@ -138,7 +138,7 @@ export const UserForm: React.FC<UserFormProps> = ({ id, onSuccess }) => {
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" {...saveButtonProps}>
-          Save
+          Lưu
         </Button>
       </Form.Item>
     </Form>

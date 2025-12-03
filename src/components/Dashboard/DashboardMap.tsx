@@ -59,14 +59,14 @@ const parseCoordinates = (
 
 interface DashboardMapProps {
   pendingReports: any[];
-  inProgressRescues: any[];
+  allRescues: any[];
   onShowReport?: (id: string) => void;
   onShowRescue?: (id: string) => void;
 }
 
 export interface DashboardMapHandle {
   flyToReport: (reportId: string) => void;
-  flyToRescue: (rescueId: string) => void;
+  flyToRescue: (rescueId: string, reports?: any[]) => void;
 }
 
 // Component to handle map center changes and expose map instance
@@ -110,14 +110,14 @@ const createCustomIcon = (color: string) => {
 };
 
 export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
-  ({ pendingReports, inProgressRescues, onShowReport, onShowRescue }, ref) => {
+  ({ pendingReports, allRescues, onShowReport, onShowRescue }, ref) => {
     const [displayMode, setDisplayMode] = useState<"reports" | "rescues">(
       "reports"
     );
     const [mapCenter, setMapCenter] = useState<[number, number]>([
-      21.0285, 105.8542,
-    ]); // Hanoi
-    const [mapZoom, setMapZoom] = useState(13);
+      10.031096092628815, 105.77915669841477,
+    ]); // Can Tho, Vietnam [lat, lng]
+    const [mapZoom, setMapZoom] = useState(14);
     const mapRef = useRef<L.Map | null>(null);
 
     // Expose methods to parent component
@@ -132,83 +132,40 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
           }
         }
       },
-      flyToRescue: (rescueId: string) => {
-        const rescue = inProgressRescues.find((r) => r.id === rescueId);
-        if (rescue && mapRef.current && rescue.reports?.[0]) {
-          const coords = parseCoordinates(rescue.reports[0].coordinates);
-          if (coords) {
-            setDisplayMode("rescues");
-            mapRef.current.flyTo(coords, 16, { duration: 1.5 });
+      flyToRescue: (rescueId: string, reports?: any[]) => {
+        const rescue = allRescues.find((r) => r.id === rescueId);
+        if (rescue && mapRef.current) {
+          // Use provided reports or rescue.reports
+          const rescueReports = reports || rescue.reports || [];
+
+          if (rescueReports.length > 0) {
+            // Calculate average position of all reports in this rescue
+            const validCoords = rescueReports
+              .map((r: any) => parseCoordinates(r.coordinates))
+              .filter(
+                (c: [number, number] | null): c is [number, number] =>
+                  c !== null
+              );
+
+            if (validCoords.length > 0) {
+              const avgLat =
+                validCoords.reduce(
+                  (sum: number, [lat]: [number, number]) => sum + lat,
+                  0
+                ) / validCoords.length;
+              const avgLng =
+                validCoords.reduce(
+                  (sum: number, [, lng]: [number, number]) => sum + lng,
+                  0
+                ) / validCoords.length;
+
+              setDisplayMode("rescues");
+              mapRef.current.flyTo([avgLat, avgLng], 14, { duration: 1.5 });
+            }
           }
         }
       },
     }));
-
-    // Calculate map center based on display mode
-    useEffect(() => {
-      const items =
-        displayMode === "reports" ? pendingReports : inProgressRescues;
-
-      if (displayMode === "reports") {
-        const validReports = items.filter((r) =>
-          parseCoordinates(r.coordinates)
-        );
-        if (validReports.length === 0) {
-          setMapCenter([21.0285, 105.8542]);
-          setMapZoom(13);
-          return;
-        }
-
-        const sum = validReports.reduce(
-          (acc, r) => {
-            const coords = parseCoordinates(r.coordinates);
-            if (coords) {
-              const [lat, lng] = coords;
-              acc.lat += lat;
-              acc.lng += lng;
-            }
-            return acc;
-          },
-          { lat: 0, lng: 0 }
-        );
-
-        const avgLat = sum.lat / validReports.length;
-        const avgLng = sum.lng / validReports.length;
-        setMapCenter([avgLat, avgLng]);
-        setMapZoom(validReports.length === 1 ? 15 : 11);
-      } else {
-        // For rescues, collect all report coordinates
-        const allCoords: [number, number][] = [];
-        inProgressRescues.forEach((rescue) => {
-          rescue.reports?.forEach((report: any) => {
-            const coords = parseCoordinates(report.coordinates);
-            if (coords) {
-              allCoords.push(coords);
-            }
-          });
-        });
-
-        if (allCoords.length === 0) {
-          setMapCenter([21.0285, 105.8542]);
-          setMapZoom(13);
-          return;
-        }
-
-        const sum = allCoords.reduce(
-          (acc, [lat, lng]) => {
-            acc.lat += lat;
-            acc.lng += lng;
-            return acc;
-          },
-          { lat: 0, lng: 0 }
-        );
-
-        const avgLat = sum.lat / allCoords.length;
-        const avgLng = sum.lng / allCoords.length;
-        setMapCenter([avgLat, avgLng]);
-        setMapZoom(allCoords.length === 1 ? 15 : 11);
-      }
-    }, [displayMode, pendingReports, inProgressRescues]);
 
     // Helper functions
     const getStatusColor = (status: string) => {
@@ -262,7 +219,7 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
                 level={4}
                 style={{ margin: 0, fontFamily: "Inter, sans-serif" }}
               >
-                Delivery Map
+                Bản đồ điều phối
               </Title>
             </Space>
             <Radio.Group
@@ -271,10 +228,10 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
               buttonStyle="solid"
             >
               <Radio.Button value="reports">
-                Pending Reports ({pendingReports.length})
+                Báo cáo ({pendingReports.length})
               </Radio.Button>
               <Radio.Button value="rescues">
-                In Progress Rescues ({inProgressRescues.length})
+                Cứu hộ ({allRescues.length})
               </Radio.Button>
             </Radio.Group>
           </div>
@@ -282,8 +239,9 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
         style={{
           borderRadius: "1rem",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          height: "100%",
         }}
-        bodyStyle={{ padding: "0", height: "450px" }}
+        bodyStyle={{ padding: "0", height: "500px" }}
       >
         <MapContainer
           center={mapCenter}
@@ -349,7 +307,7 @@ export const DashboardMap = forwardRef<DashboardMapHandle, DashboardMapProps>(
             })}
 
           {displayMode === "rescues" &&
-            inProgressRescues.map((rescue) => {
+            allRescues.map((rescue) => {
               return rescue.reports?.map((report: any) => {
                 const coords = parseCoordinates(report.coordinates);
                 if (!coords) return null;

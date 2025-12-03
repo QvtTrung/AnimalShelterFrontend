@@ -111,12 +111,33 @@ export const PetList: React.FC = () => {
     setSorters(validSorters);
   };
 
+  // Status mapping
+  const statusMap: Record<string, string> = {
+    available: "Có sẵn",
+    pending: "Chờ xử lý",
+    adopted: "Đã nhận nuôi",
+    archived: "Đã lưu trữ",
+  };
+
+  // Size mapping
+  const sizeMap: Record<string, string> = {
+    small: "Nhỏ",
+    medium: "Trung bình",
+    large: "Lớn",
+  };
+
+  // Age unit mapping
+  const ageUnitMap: Record<string, string> = {
+    months: "tháng",
+    years: "năm",
+  };
+
   return (
-    <List headerButtons={<CreateButton type="primary" />}>
+    <List title="Thú cưng" headerButtons={<CreateButton type="primary" />}>
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}
-          placeholder="Search by name"
+          placeholder="Tìm kiếm theo tên"
           allowClear
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
@@ -124,43 +145,43 @@ export const PetList: React.FC = () => {
         />
 
         <Select
-          placeholder="Status"
+          placeholder="Trạng thái"
           allowClear
           style={{ width: 160 }}
           value={status}
           onChange={(v) => handleStatusChange(v as string | undefined)}
           options={[
-            { value: "available", label: "Available" },
-            { value: "pending", label: "Pending" },
-            { value: "adopted", label: "Adopted" },
-            { value: "archived", label: "Archived" },
+            { value: "available", label: "Có sẵn" },
+            { value: "pending", label: "Chờ xử lý" },
+            { value: "adopted", label: "Đã nhận nuôi" },
+            { value: "archived", label: "Đã lưu trữ" },
           ]}
         />
 
         <Select
-          placeholder="Species"
+          placeholder="Loài"
           allowClear
           style={{ width: 160 }}
           value={species}
           onChange={(v) => handleSpeciesChange(v as string | undefined)}
           options={[
-            { value: "dog", label: "Dog" },
-            { value: "cat", label: "Cat" },
-            { value: "bird", label: "Bird" },
-            { value: "other", label: "Other" },
+            { value: "dog", label: "Chó" },
+            { value: "cat", label: "Mèo" },
+            { value: "bird", label: "Chim" },
+            { value: "other", label: "Khác" },
           ]}
         />
 
         <Select
-          placeholder="Size"
+          placeholder="Kích cỡ"
           allowClear
           style={{ width: 160 }}
           value={size}
           onChange={(v) => handleSizeChange(v as string | undefined)}
           options={[
-            { value: "small", label: "Small" },
-            { value: "medium", label: "Medium" },
-            { value: "large", label: "Large" },
+            { value: "small", label: "Nhỏ" },
+            { value: "medium", label: "Trung bình" },
+            { value: "large", label: "Lớn" },
           ]}
         />
       </Space>
@@ -191,42 +212,44 @@ export const PetList: React.FC = () => {
           ...tableProps.pagination,
           position: ["bottomCenter"],
           showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+            `${range[0]}-${range[1]} trong ${total} mục`,
         }}
       >
         <Table.Column<IPet>
           dataIndex="name"
-          title="Name"
+          title="Tên"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
         />
         <Table.Column<IPet>
           dataIndex="species"
-          title="Species"
+          title="Loài"
           render={(v) => <TextField value={v ?? "-"} />}
         />
         <Table.Column<IPet>
           dataIndex="age"
-          title="Age"
+          title="Tuổi"
           render={(value, record) =>
-            `${value ?? "-"} ${record?.age_unit ?? ""}`
+            `${value ?? "-"} ${
+              ageUnitMap[record?.age_unit || ""] || record?.age_unit || ""
+            }`
           }
           sorter
         />
         <Table.Column<IPet>
           dataIndex="size"
-          title="Size"
+          title="Kích cỡ"
           render={(v) => (
             <Tag
               color={v === "small" ? "green" : v === "medium" ? "blue" : "red"}
             >
-              {v}
+              {sizeMap[v] || v}
             </Tag>
           )}
         />
         <Table.Column<IPet>
           dataIndex="status"
-          title="Status"
+          title="Trạng thái"
           render={(v) => {
             const colorMap: Record<string, string> = {
               available: "green",
@@ -234,11 +257,13 @@ export const PetList: React.FC = () => {
               adopted: "blue",
               archived: "gray",
             };
-            return <Tag color={colorMap[v] || "default"}>{v}</Tag>;
+            return (
+              <Tag color={colorMap[v] || "default"}>{statusMap[v] || v}</Tag>
+            );
           }}
         />
         <Table.Column<IPet>
-          title="Actions"
+          title="Thao tác"
           dataIndex="actions"
           render={(_, record) => (
             <Space>

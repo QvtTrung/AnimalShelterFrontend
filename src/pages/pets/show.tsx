@@ -85,33 +85,64 @@ export const PetShow = () => {
     }
   };
 
+  // Vietnamese mappings
+  const statusMap: Record<string, string> = {
+    available: "Có sẵn",
+    pending: "Chờ xử lý",
+    adopted: "Đã nhận nuôi",
+    archived: "Đã lưu trữ",
+  };
+
+  const sizeMap: Record<string, string> = {
+    small: "Nhỏ",
+    medium: "Trung bình",
+    large: "Lớn",
+  };
+
+  const ageUnitMap: Record<string, string> = {
+    months: "tháng",
+    years: "năm",
+  };
+
+  const healthStatusMap: Record<string, string> = {
+    healthy: "Khỏe mạnh",
+    needs_attention: "Cần chăm sóc",
+    critical: "Nghiêm trọng",
+    deceased: "Đã chết",
+  };
+
   return (
     <Show isLoading={isLoading}>
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
-        <Descriptions.Item label="Name">{record?.name}</Descriptions.Item>
-        <Descriptions.Item label="Species">{record?.species}</Descriptions.Item>
-        <Descriptions.Item label="Description">
+        <Descriptions.Item label="Tên">{record?.name}</Descriptions.Item>
+        <Descriptions.Item label="Loài">{record?.species}</Descriptions.Item>
+        <Descriptions.Item label="Mô tả">
           {record?.description}
         </Descriptions.Item>
-        <Descriptions.Item label="Age">
-          {record?.age} {record?.age_unit}
+        <Descriptions.Item label="Tuổi">
+          {record?.age} {ageUnitMap[record?.age_unit || ""] || record?.age_unit}
         </Descriptions.Item>
-        <Descriptions.Item label="Size">
-          <Tag color={getSizeColor(record?.size || "")}>{record?.size}</Tag>
+        <Descriptions.Item label="Kích cỡ">
+          <Tag color={getSizeColor(record?.size || "")}>
+            {sizeMap[record?.size || ""] || record?.size}
+          </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Health Status">
+        <Descriptions.Item label="Tình trạng sức khỏe">
           <Tag color={getHealthStatusColor(record?.health_status || "")}>
-            {record?.health_status}
+            {healthStatusMap[record?.health_status || ""] ||
+              record?.health_status}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Gender">{record?.gender}</Descriptions.Item>
-        <Descriptions.Item label="Status">
+        <Descriptions.Item label="Giới tính">
+          {record?.gender}
+        </Descriptions.Item>
+        <Descriptions.Item label="Trạng thái">
           <Tag color={getStatusColor(record?.status || "")}>
-            {record?.status}
+            {statusMap[record?.status || ""] || record?.status}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Images">
+        <Descriptions.Item label="Hình ảnh">
           {images.length > 0 ? (
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
@@ -135,7 +166,7 @@ export const PetShow = () => {
               }}
             />
           ) : (
-            <span>No images available</span>
+            <span>Không có hình ảnh</span>
           )}
         </Descriptions.Item>
       </Descriptions>

@@ -65,17 +65,31 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Get refresh token from localStorage
+        const refresh_token = localStorage.getItem("refresh_token");
+
+        if (!refresh_token) {
+          throw new Error("No refresh token available");
+        }
+
         // Attempt to refresh the token
-        const response = await axiosInstance.post("/auth/refresh");
-        const { directusUser, user, token, refresh_token } = response.data.data;
+        const response = await axiosInstance.post("/auth/refresh", {
+          refresh_token,
+        });
+        const {
+          directusUser,
+          user,
+          token,
+          refresh_token: newRefreshToken,
+        } = response.data.data;
 
         if (token) {
           // Update stored token and user data
           localStorage.setItem("token", token);
 
           // Store refresh token if provided
-          if (refresh_token) {
-            localStorage.setItem("refresh_token", refresh_token);
+          if (newRefreshToken) {
+            localStorage.setItem("refresh_token", newRefreshToken);
           }
 
           if (directusUser) {
@@ -100,20 +114,30 @@ axiosInstance.interceptors.response.use(
         } else {
           throw new Error("No token received from refresh endpoint");
         }
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         console.error("Token refresh failed:", refreshError);
 
         // Reject all queued requests
         processQueue(refreshError, null);
 
-        // Clear authentication data
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("directusUser");
-        localStorage.removeItem("appUser");
+        // Check if this is a token expiration error
+        const errorMessage =
+          refreshError?.response?.data?.message || refreshError?.message || "";
+        if (
+          errorMessage.includes("expired") ||
+          errorMessage.includes("hết hạn")
+        ) {
+          // Clear tokens and redirect to login
+          localStorage.removeItem("token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("directusUser");
+          localStorage.removeItem("appUser");
 
-        // Redirect to login page
-        window.location.href = "/login";
+          // Force page reload to trigger auth redirect
+          if (!window.location.pathname.includes("/login")) {
+            window.location.href = "/login";
+          }
+        }
 
         return Promise.reject(refreshError);
       } finally {
@@ -140,15 +164,9 @@ export const dataProvider: DataProvider = {
       const pageSize = (pagination as any).pageSize || 10;
       params.page = currentPage;
       params.limit = pageSize;
-      console.log(`Pagination for ${resource}:`, {
-        currentPage,
-        pageSize,
-        mode: pagination.mode,
-      });
     } else if (pagination?.mode === "off") {
       // When pagination is off, set a high limit to get all records
       params.limit = -1; // Directus uses -1 to fetch all records
-      console.log(`Pagination OFF for ${resource} - fetching all records`);
     }
 
     // Handle meta fields for nested data fetching
@@ -330,16 +348,8 @@ export const dataProvider: DataProvider = {
 
       // Handle different payload types
       if (payload) {
-        // Debug payload type
-        console.log("Payload type:", typeof payload);
-        console.log("Is FormData:", payload instanceof FormData);
-
         // If payload is FormData, don't set Content-Type header
         if (payload instanceof FormData) {
-          console.log("FormData entries before sending:");
-          for (let pair of payload.entries()) {
-            console.log(pair[0] + ": ", pair[1]);
-          }
           config.data = payload;
           delete config.headers["Content-Type"];
         } else {

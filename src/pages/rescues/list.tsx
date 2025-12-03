@@ -116,6 +116,14 @@ export const RescueList = () => {
     },
   });
 
+  // Status mapping
+  const statusMap: Record<string, string> = {
+    planned: "Đã lên kế hoạch",
+    in_progress: "Đang thực hiện",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+  };
+
   // Apply filters (name debounced only)
   useEffect(() => {
     setFilters((prev = []) => {
@@ -254,11 +262,11 @@ export const RescueList = () => {
   };
 
   return (
-    <List headerButtons={<CreateButton type="primary" />}>
+    <List title="Cứu hộ" headerButtons={<CreateButton type="primary" />}>
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}
-          placeholder="Search by title"
+          placeholder="Tìm theo tiêu đề"
           allowClear
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
@@ -266,28 +274,28 @@ export const RescueList = () => {
         />
 
         <RangePicker
-          placeholder={["Start date", "End date"]}
+          placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
           format="DD/MM/YYYY"
           style={{ width: 240 }}
           onChange={handleDateRangeChange}
         />
 
         <Select
-          placeholder="Status"
+          placeholder="Trạng thái"
           allowClear
           style={{ width: 160 }}
           value={status}
           onChange={handleStatusChange}
           options={[
-            { label: "Planned", value: "planned" },
-            { label: "In Progress", value: "in_progress" },
-            { label: "Completed", value: "completed" },
-            { label: "Cancelled", value: "cancelled" },
+            { label: "Đã lên kế hoạch", value: "planned" },
+            { label: "Đang thực hiện", value: "in_progress" },
+            { label: "Hoàn thành", value: "completed" },
+            { label: "Đã hủy", value: "cancelled" },
           ]}
         />
 
         <InputNumber
-          placeholder="Min participants"
+          placeholder="Tối thiểu thành viên"
           min={1}
           style={{ width: 150 }}
           value={minParticipants}
@@ -295,7 +303,7 @@ export const RescueList = () => {
         />
 
         <InputNumber
-          placeholder="Max participants"
+          placeholder="Tối đa thành viên"
           min={1}
           style={{ width: 150 }}
           value={maxParticipants}
@@ -318,31 +326,38 @@ export const RescueList = () => {
           ...tableProps.pagination,
           position: ["bottomCenter"],
           showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+            `${range[0]}-${range[1]} trong tổng số ${total} mục`,
         }}
         scroll={{ x: 1200 }}
         style={{ tableLayout: "fixed" }}
       >
         <Table.Column
           dataIndex="title"
-          title="Title"
+          title="Tiêu đề"
           width={200}
           sorter
           ellipsis={{ showTitle: false }}
           render={(value, record: IRescue) => (
             <div title={value}>
-              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>
+              <div
+                style={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  marginBottom: 4,
+                }}
+              >
                 {value}
               </div>
               <Tag color={getStatusColor(record.status || "")}>
-                {record.status?.toUpperCase()}
+                {statusMap[record.status || ""] || record.status?.toUpperCase()}
               </Tag>
             </div>
           )}
         />
         <Table.Column
           dataIndex="required_participants"
-          title="Participants"
+          title="Thành viên"
           render={(value, record: IRescue) => {
             const participantsCount = (record as any).participants?.length || 0;
             const requiredCount = value || 0;
@@ -361,7 +376,7 @@ export const RescueList = () => {
         />
         <Table.Column
           dataIndex="reports"
-          title="Reports"
+          title="Báo cáo"
           render={(value: any[], record: IRescue) => {
             const reportsCount = value?.length || 0;
             if (reportsCount === 0) return "-";
@@ -399,23 +414,30 @@ export const RescueList = () => {
         />
         <Table.Column
           dataIndex="description"
-          title="Description"
+          title="Mô tả"
           width={250}
           ellipsis={{ showTitle: false }}
           render={(value) => (
-            <div title={value} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {value || '-'}
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value || "-"}
             </div>
           )}
         />
         <Table.Column
           dataIndex="date_created"
-          title="Date Created"
+          title="Ngày tạo"
           sorter
           render={(value) => <DateField value={value} format="DD/MM/YYYY" />}
         />
         <Table.Column
-          title="Actions"
+          title="Hành động"
           dataIndex="actions"
           render={(_, record) => (
             <Space>

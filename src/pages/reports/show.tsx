@@ -10,7 +10,25 @@ import { LocationPicker } from "../../components/Map/LocationPicker";
 const { Title, Text } = Typography;
 
 export const ReportShow = () => {
-  const { query: queryResult } = useShow<IReport>();
+  const { query: queryResult } = useShow<IReport>({
+    meta: {
+      fields: [
+        "id",
+        "title",
+        "description",
+        "species",
+        "type",
+        "location",
+        "coordinates",
+        "urgency_level",
+        "status",
+        "date_created",
+        "date_updated",
+        "user_created.*",
+        "images.*",
+      ],
+    },
+  });
   const { data, isLoading } = queryResult;
   const record = data?.data;
   console.log("data:", data);
@@ -22,8 +40,10 @@ export const ReportShow = () => {
 
   console.log("reporter:", reporterData);
 
-  // Backend already includes images in the report data (reports_image field)
-  const images = record?.reports_image || [];
+  // Backend already includes images in the report data (images field)
+  const images = record?.images || [];
+
+  console.log("Images data:", images);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,52 +88,74 @@ export const ReportShow = () => {
     }
   };
 
+  // Vietnamese mappings
+  const statusMap: Record<string, string> = {
+    pending: "Chờ xử lý",
+    assigned: "Đã gán",
+    resolved: "Đã giải quyết",
+  };
+
+  const typeMap: Record<string, string> = {
+    abuse: "Bị ngược đãi",
+    abandonment: "Bị bỏ rơi",
+    injured_animal: "Động vật bị thương",
+    other: "Khác",
+  };
+
+  const urgencyMap: Record<string, string> = {
+    low: "Thấp",
+    medium: "Trung bình",
+    high: "Cao",
+    critical: "Nghiêm trọng",
+  };
+
   return (
     <Show isLoading={isLoading}>
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
-        <Descriptions.Item label="Title">{record?.title}</Descriptions.Item>
-        <Descriptions.Item label="Species">{record?.species}</Descriptions.Item>
-        <Descriptions.Item label="Type">
+        <Descriptions.Item label="Tiêu đề">{record?.title}</Descriptions.Item>
+        <Descriptions.Item label="Loài">{record?.species}</Descriptions.Item>
+        <Descriptions.Item label="Loại">
           <Tag color={getTypeColor(record?.type || "")}>{record?.type}</Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Description">
+        <Descriptions.Item label="Mô tả">
           {record?.description}
         </Descriptions.Item>
-        <Descriptions.Item label="Location">
+        <Descriptions.Item label="Vị trí">
           {record?.location || "-"}
         </Descriptions.Item>
-        <Descriptions.Item label="Urgency Level">
+        <Descriptions.Item label="Mức độ khẩn cấp">
           <Tag color={getUrgencyColor(record?.urgency_level || "")}>
             {record?.urgency_level}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Reporter">
-          {reporterData?.first_name || "Loading..."}{" "}
+        <Descriptions.Item label="Người báo cáo">
+          {reporterData?.first_name || "Loading..."}
+          {" "}
           {reporterData?.last_name || ""}
         </Descriptions.Item>
-        <Descriptions.Item label="Reporter Email">
+        <Descriptions.Item label="Email người báo cáo">
           {reporterData?.email || "Loading..."}
         </Descriptions.Item>
-        <Descriptions.Item label="Status">
+        <Descriptions.Item label="Trạng thái">
           <Tag color={getStatusColor(record?.status || "")}>
             {record?.status}
           </Tag>
         </Descriptions.Item>
-        <Descriptions.Item label="Date Created">
+        <Descriptions.Item label="Ngày tạo">
           {record?.date_created
             ? new Date(record.date_created).toLocaleString()
             : "N/A"}
         </Descriptions.Item>
-        <Descriptions.Item label="Date Updated">
+        <Descriptions.Item label="Ngày cập nhật">
           {record?.date_updated
             ? new Date(record.date_updated).toLocaleString()
             : "N/A"}
         </Descriptions.Item>
         {/* Coordinates map moved outside of table */}
-        <Descriptions.Item label="Images">
+        <Descriptions.Item label="Hình ảnh">
           {!record ? (
-            <span>Loading images...</span>
+            <span>Đang tải hình ảnh...</span>
           ) : images.length > 0 ? (
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
@@ -136,14 +178,14 @@ export const ReportShow = () => {
               }}
             />
           ) : (
-            <span>No images available</span>
+            <span>Không có hình ảnh</span>
           )}
         </Descriptions.Item>
       </Descriptions>
 
       {/* Coordinates Map */}
       <div className="mt-5">
-        <Title level={4}>Location on Map</Title>
+        <Title level={4}>Vị trí trên bản đồ</Title>
         {record?.coordinates ? (
           <div className="h-96 w-full">
             <LocationPicker
@@ -190,7 +232,7 @@ export const ReportShow = () => {
             />
           </div>
         ) : (
-          <span>No coordinates available</span>
+          <span>Không có toạ độ</span>
         )}
       </div>
     </Show>

@@ -71,7 +71,7 @@ export const ProfilePage: React.FC = () => {
         },
         {
           onSuccess: (data) => {
-            message.success("Profile updated successfully");
+            message.success("Cập nhật hồ sơ thành công");
             setEditMode(false);
 
             // Update localStorage with new values
@@ -105,13 +105,13 @@ export const ProfilePage: React.FC = () => {
             refetch();
           },
           onError: (error) => {
-            message.error("Failed to update profile");
+            message.error("Cập nhật hồ sơ thất bại");
             console.error(error);
           },
         }
       );
     } catch (error) {
-      message.error("An error occurred");
+      message.error("Đã xảy ra lỗi");
       console.error(error);
     } finally {
       setLoading(false);
@@ -151,22 +151,18 @@ export const ProfilePage: React.FC = () => {
             <Row gutter={16}>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="First Name"
+                  label="Tên"
                   name="first_name"
-                  rules={[
-                    { required: true, message: "Please enter first name" },
-                  ]}
+                  rules={[{ required: true, message: "Vui lòng nhập tên" }]}
                 >
                   <Input disabled={!editMode} />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="Last Name"
+                  label="Họ"
                   name="last_name"
-                  rules={[
-                    { required: true, message: "Please enter last name" },
-                  ]}
+                  rules={[{ required: true, message: "Vui lòng nhập họ" }]}
                 >
                   <Input disabled={!editMode} />
                 </Form.Item>
@@ -177,41 +173,41 @@ export const ProfilePage: React.FC = () => {
               label="Email"
               name="email"
               rules={[
-                { required: true, message: "Please enter email" },
-                { type: "email", message: "Please enter a valid email" },
+                { required: true, message: "Vui lòng nhập email" },
+                { type: "email", message: "Vui lòng nhập email hợp lệ" },
               ]}
             >
               <Input disabled={!editMode} />
             </Form.Item>
 
-            <Form.Item label="Phone Number" name="phone_number">
+            <Form.Item label="Số điện thoại" name="phone_number">
               <Input disabled={!editMode} />
             </Form.Item>
 
-            <Form.Item label="Address" name="address">
+            <Form.Item label="Địa chỉ" name="address">
               <Input.TextArea rows={4} disabled={!editMode} />
             </Form.Item>
 
             <Row gutter={16}>
               <Col xs={24} sm={12}>
-                <Form.Item label="Role" name="role">
+                <Form.Item label="Vai trò" name="role">
                   <Select
                     disabled
                     options={[
-                      { label: "User", value: "User" },
-                      { label: "Staff", value: "Staff" },
-                      { label: "Administrator", value: "Administrator" },
+                      { label: "Người dùng", value: "User" },
+                      { label: "Nhân viên", value: "Staff" },
+                      { label: "Quản trị viên", value: "Administrator" },
                     ]}
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
-                <Form.Item label="Status" name="status">
+                <Form.Item label="Trạng thái" name="status">
                   <Select
                     disabled
                     options={[
-                      { label: "Active", value: "active" },
-                      { label: "Inactive", value: "inactive" },
+                      { label: "Hoạt động", value: "active" },
+                      { label: "Không hoạt động", value: "inactive" },
                     ]}
                   />
                 </Form.Item>
@@ -222,7 +218,7 @@ export const ProfilePage: React.FC = () => {
               <Space>
                 {!editMode ? (
                   <Button type="primary" onClick={() => setEditMode(true)}>
-                    Edit Profile
+                    Chỉnh sửa hồ sơ
                   </Button>
                 ) : (
                   <>
@@ -239,7 +235,7 @@ export const ProfilePage: React.FC = () => {
                         }
                       }}
                     >
-                      Save Changes
+                      Lưu thay đổi
                     </Button>
                     <Button
                       onClick={() => {
@@ -247,7 +243,7 @@ export const ProfilePage: React.FC = () => {
                         form.resetFields();
                       }}
                     >
-                      Cancel
+                      Hủy
                     </Button>
                   </>
                 )}

@@ -39,7 +39,9 @@ export const AdoptionConfirm = () => {
     return (
       <div style={{ textAlign: "center", padding: "100px 20px" }}>
         <Spin size="large" />
-        <p style={{ marginTop: 20 }}>Confirming your adoption request...</p>
+        <p style={{ marginTop: 20 }}>
+          Đang xác nhận yêu cầu nhận nuôi của bạn...
+        </p>
       </div>
     );
   }
@@ -49,11 +51,11 @@ export const AdoptionConfirm = () => {
       <Result
         status="success"
         icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
-        title="Adoption Confirmed Successfully!"
-        subTitle="Thank you for confirming your adoption request. Our team will contact you shortly to schedule the appointment."
+        title="Xác nhận Nhận nuôi Thành công!"
+        subTitle="Cảm ơn bạn đã xác nhận yêu cầu nhận nuôi. Đội ngũ của chúng tôi sẽ liên hệ với bạn sớm để sắp xếp lịch hẹn."
         extra={[
           <Button type="primary" key="home" onClick={() => navigate("/")}>
-            Go to Home
+            Về Trang chủ
           </Button>,
         ]}
       />
@@ -64,14 +66,14 @@ export const AdoptionConfirm = () => {
     <Result
       status="error"
       icon={<CloseCircleOutlined style={{ color: "#ff4d4f" }} />}
-      title="Confirmation Failed"
+      title="Xác nhận Thất bại"
       subTitle={
         errorMessage ||
-        "We couldn't confirm your adoption request. The link may have expired or already been used."
+        "Chúng tôi không thể xác nhận yêu cầu nhận nuôi của bạn. Liên kết có thể đã hết hạn hoặc đã được sử dụng."
       }
       extra={[
         <Button type="primary" key="home" onClick={() => navigate("/")}>
-          Go to Home
+          Về Trang chủ
         </Button>,
       ]}
     />

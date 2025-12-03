@@ -141,9 +141,9 @@ export const RescueForm: React.FC<RescueFormProps> = ({
   }, [participants, reports]);
 
   const handleAddUser = () => {
-    if (!selectedUserId) return message.error("Please select a user");
+    if (!selectedUserId) return message.error("Vui lòng chọn người dùng");
     if (participants.some((p) => p.users_id === selectedUserId))
-      return message.error("User is already a participant");
+      return message.error("Người dùng đã là thành viên");
 
     // Check if there are already enough participants
     const requiredParticipants = formProps?.form?.getFieldValue(
@@ -151,7 +151,7 @@ export const RescueForm: React.FC<RescueFormProps> = ({
     );
     if (requiredParticipants && participants.length >= requiredParticipants) {
       return message.error(
-        `Cannot add more participants. Maximum required participants (${requiredParticipants}) already reached.`
+        `Không thể thêm thành viên. Đã đạt số thành viên tối đa (${requiredParticipants}).`
       );
     }
 
@@ -169,8 +169,8 @@ export const RescueForm: React.FC<RescueFormProps> = ({
           },
         },
         {
-          onSuccess: () => message.success("Participant added"),
-          onError: () => message.error("Failed to add participant"),
+          onSuccess: () => message.success("Đã thêm thành viên"),
+          onError: () => message.error("Không thể thêm thành viên"),
         }
       );
     }
@@ -217,14 +217,14 @@ export const RescueForm: React.FC<RescueFormProps> = ({
         {
           onSuccess: (response) => {
             console.log("API response:", response); // Debug log
-            message.success("Participant removed successfully");
+            message.success("Đã xóa thành viên thành công");
             setParticipants((prev) =>
               prev.filter((p) => p.users_id !== userId)
             );
           },
           onError: (error) => {
             console.error("Failed to remove participant:", error);
-            message.error("Failed to remove participant");
+            message.error("Không thể xóa thành viên");
             // Still remove from UI even if API call fails
             setParticipants((prev) =>
               prev.filter((p) => p.users_id !== userId)
@@ -241,7 +241,7 @@ export const RescueForm: React.FC<RescueFormProps> = ({
 
   const handleAddReports = () => {
     if (selectedReportIds.length === 0)
-      return message.error("Please select at least one report");
+      return message.error("Vui lòng chọn ít nhất một báo cáo");
     const rescueId = initialValues?.id;
 
     selectedReportIds.forEach((reportId) => {
@@ -301,12 +301,12 @@ export const RescueForm: React.FC<RescueFormProps> = ({
         {
           onSuccess: (response) => {
             console.log("API response:", response); // Debug log
-            message.success("Report removed successfully");
+            message.success("Đã gỡ báo cáo thành công");
             setReports((prev) => prev.filter((r) => r.reports_id !== reportId));
           },
           onError: (error) => {
             console.error("Failed to remove report:", error);
-            message.error("Failed to remove report");
+            message.error("Không thể gỡ báo cáo");
             // Still remove from UI even if API call fails
             setReports((prev) => prev.filter((r) => r.reports_id !== reportId));
           },
@@ -328,37 +328,33 @@ export const RescueForm: React.FC<RescueFormProps> = ({
 
   return (
     <Form {...formProps} layout="vertical" initialValues={initialValues}>
-      <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+      <Form.Item label="Tiêu đề" name="title" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
-      <Form.Item
-        label="Description"
-        name="description"
-        rules={[{ required: true }]}
-      >
+      <Form.Item label="Mô tả" name="description" rules={[{ required: true }]}>
         <Input.TextArea rows={4} />
       </Form.Item>
       <Form.Item
-        label="Required Participants"
+        label="Thành viên cần thiết"
         name="required_participants"
         rules={[{ required: true }]}
       >
         <InputNumber min={1} style={{ width: "100%" }} />
       </Form.Item>
-      <Form.Item label="Status" name="status" rules={[{ required: true }]}>
+      <Form.Item label="Trạng thái" name="status" rules={[{ required: true }]}>
         <Select
           options={[
-            { label: "Planned", value: "planned" },
-            { label: "In Progress", value: "in_progress" },
-            { label: "Completed", value: "completed" },
-            { label: "Cancelled", value: "cancelled" },
+            { label: "Đã lên kế hoạch", value: "planned" },
+            { label: "Đang thực hiện", value: "in_progress" },
+            { label: "Hoàn thành", value: "completed" },
+            { label: "Đã hủy", value: "cancelled" },
           ]}
         />
       </Form.Item>
 
-      <Divider>Participants</Divider>
+      <Divider>Thành viên</Divider>
       <Card
-        title="Rescue Participants"
+        title="Thành viên chiến dịch cứu hộ"
         extra={
           <Button
             type="primary"
@@ -371,7 +367,7 @@ export const RescueForm: React.FC<RescueFormProps> = ({
                 : false
             }
           >
-            Add Participant
+            Thêm thành viên
           </Button>
         }
       >
@@ -406,16 +402,16 @@ export const RescueForm: React.FC<RescueFormProps> = ({
         />
       </Card>
 
-      <Divider>Reports</Divider>
+      <Divider>Báo cáo</Divider>
       <Card
-        title="Included Reports"
+        title="Báo cáo liên kết"
         extra={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setIsReportModalVisible(true)}
           >
-            Add Reports
+            Thêm báo cáo
           </Button>
         }
       >
@@ -447,26 +443,26 @@ export const RescueForm: React.FC<RescueFormProps> = ({
 
       <Form.Item>
         <Button type="primary" htmlType="submit">
-          Save
+          Lưu
         </Button>
       </Form.Item>
 
       {/* User Modal */}
       <Modal
-        title="Add Participant"
+        title="Thêm thành viên"
         open={isUserModalVisible}
         onOk={handleAddUser}
         onCancel={() => setIsUserModalVisible(false)}
       >
         <Select
-          placeholder="Select a user"
+          placeholder="Chọn người dùng"
           value={selectedUserId}
           onChange={setSelectedUserId}
           options={userOptions}
           style={{ width: "100%", marginBottom: 16 }}
         />
         <Select
-          placeholder="Select role"
+          placeholder="Chọn vai trò"
           value={selectedUserRoles[selectedUserId || ""]}
           onChange={(value) =>
             selectedUserId &&
@@ -476,8 +472,8 @@ export const RescueForm: React.FC<RescueFormProps> = ({
             })
           }
           options={[
-            { label: "Leader", value: "leader" },
-            { label: "Member", value: "member" },
+            { label: "Trưởng nhóm", value: "leader" },
+            { label: "Thành viên", value: "member" },
           ]}
           style={{ width: "100%" }}
         />
@@ -485,14 +481,14 @@ export const RescueForm: React.FC<RescueFormProps> = ({
 
       {/* Report Modal */}
       <Modal
-        title="Add Reports"
+        title="Thêm báo cáo"
         open={isReportModalVisible}
         onOk={handleAddReports}
         onCancel={() => setIsReportModalVisible(false)}
       >
         <Select
           mode="multiple"
-          placeholder="Select reports"
+          placeholder="Chọn báo cáo"
           value={selectedReportIds}
           onChange={setSelectedReportIds}
           options={reportOptions}

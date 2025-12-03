@@ -93,11 +93,11 @@ export const PetForm: React.FC<PetFormProps> = ({
         });
 
         setExistingImages((prevImages) => [...prevImages, ...processedImages]);
-        message.success("Image uploaded successfully");
+        message.success("Tải hình ảnh thành công");
       },
       onError: (error: any) => {
         console.error("Upload failed:", error);
-        message.error("Failed to upload image");
+        message.error("Tải hình ảnh thất bại");
       },
     });
 
@@ -109,7 +109,7 @@ export const PetForm: React.FC<PetFormProps> = ({
       if (imageData && petId) {
         console.log("API Response:", imageData);
         // Check if imageData.data.data exists and is an array
-        if (Array.isArray(imageData.data.data)) {
+        if (imageData.data && Array.isArray(imageData.data.data)) {
           setExistingImages(imageData.data.data);
         } else {
           setExistingImages([]);
@@ -187,13 +187,13 @@ export const PetForm: React.FC<PetFormProps> = ({
                   ...prevImages,
                   ...processedImages,
                 ]);
-                message.success("Image uploaded successfully");
+                message.success("Tải hình ảnh thành công");
                 resolve();
                 onSuccess(file);
               },
               onError: (error: any) => {
                 console.error("Upload failed:", error);
-                message.error("Failed to upload image");
+                message.error("Tải hình ảnh thất bại");
                 reject(error);
               },
             }
@@ -209,7 +209,7 @@ export const PetForm: React.FC<PetFormProps> = ({
       }
     } catch (error) {
       console.error("Upload failed:", error);
-      message.error("Failed to upload image");
+      message.error("Tải hình ảnh thất bại");
       onError(error);
     } finally {
       setUploading(false);
@@ -267,17 +267,17 @@ export const PetForm: React.FC<PetFormProps> = ({
                   console.log("Filtered images:", filteredImages);
                   return filteredImages;
                 });
-                message.success("Image deleted successfully");
+                message.success("Đã xóa hình ảnh thành công");
               } else {
                 console.error("Could not extract image ID from response");
-                message.error("Failed to identify deleted image");
+                message.error("Không thể xác định hình ảnh đã xóa");
               }
 
               resolve();
             },
             onError: (error: any) => {
               console.error("Delete mutation failed:", error);
-              message.error("Failed to delete image");
+              message.error("Xóa hình ảnh thất bại");
               reject(error);
             },
           }
@@ -334,100 +334,102 @@ export const PetForm: React.FC<PetFormProps> = ({
       layout="vertical"
       onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
     >
-      <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+      <Form.Item label="Tên" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item label="Species" name="species" rules={[{ required: true }]}>
+      <Form.Item label="Loài" name="species" rules={[{ required: true }]}>
         <Select
           options={[
-            { label: "Dog", value: "dog" },
-            { label: "Cat", value: "cat" },
-            { label: "Other", value: "other" },
+            { label: "Chó", value: "dog" },
+            { label: "Mèo", value: "cat" },
+            { label: "Khác", value: "other" },
           ]}
         />
       </Form.Item>
 
-      <Form.Item label="Description" name="description">
+      <Form.Item label="Mô tả" name="description">
         <Input.TextArea rows={4} />
       </Form.Item>
 
-      <Form.Item label="Age" name="age" rules={[{ required: true }]}>
+      <Form.Item label="Tuổi" name="age" rules={[{ required: true }]}>
         <InputNumber min={0} />
       </Form.Item>
 
-      <Form.Item label="Age Unit" name="age_unit" rules={[{ required: true }]}>
+      <Form.Item
+        label="Đơn vị tuổi"
+        name="age_unit"
+        rules={[{ required: true }]}
+      >
         <Select
           options={[
-            { label: "Months", value: "months" },
-            { label: "Years", value: "years" },
+            { label: "Tháng", value: "months" },
+            { label: "Năm", value: "years" },
           ]}
         />
       </Form.Item>
 
-      <Form.Item label="Size" name="size" rules={[{ required: true }]}>
+      <Form.Item label="Kích cỡ" name="size" rules={[{ required: true }]}>
         <Select
           options={[
-            { label: "Small", value: "small" },
-            { label: "Medium", value: "medium" },
-            { label: "Large", value: "large" },
+            { label: "Nhỏ", value: "small" },
+            { label: "Trung bình", value: "medium" },
+            { label: "Lớn", value: "large" },
           ]}
         />
       </Form.Item>
 
       <Form.Item
-        label="Health Status"
+        label="Tình trạng sức khỏe"
         name="health_status"
         rules={[{ required: true }]}
       >
         <Select
           options={[
-            { label: "Healthy", value: "healthy" },
-            { label: "Needs Attention", value: "needs_attention" },
-            { label: "Critical", value: "critical" },
-            { label: "Deceased", value: "deceased" },
+            { label: "Khỏe mạnh", value: "healthy" },
+            { label: "Cần chăm sóc", value: "needs_attention" },
+            { label: "Nguy kịch", value: "critical" },
+            { label: "Đã chết", value: "deceased" },
           ]}
         />
       </Form.Item>
 
-      <Form.Item label="Gender" name="gender">
+      <Form.Item label="Giới tính" name="gender">
         <Select
           options={[
-            { label: "Male", value: "male" },
-            { label: "Female", value: "female" },
-            { label: "Unknown", value: "unknown" },
+            { label: "Đực", value: "male" },
+            { label: "Cái", value: "female" },
+            { label: "Không rõ", value: "unknown" },
           ]}
         />
       </Form.Item>
 
-      <Form.Item label="Status" name="status" rules={[{ required: true }]}>
+      <Form.Item label="Trạng thái" name="status" rules={[{ required: true }]}>
         <Select
           options={[
-            { label: "Available", value: "available" },
-            { label: "Pending", value: "pending" },
-            { label: "Adopted", value: "adopted" },
-            { label: "Archived", value: "archived" },
+            { label: "Có sẵn", value: "available" },
+            { label: "Chờ xử lý", value: "pending" },
+            { label: "Đã nhận nuôi", value: "adopted" },
+            { label: "Đã lưu trữ", value: "archived" },
           ]}
         />
       </Form.Item>
 
-      <Form.Item label="Pet Images">
+      <Form.Item label="Hình ảnh thú cưng">
         <Upload.Dragger {...uploadProps}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">
-            Click or drag file to this area to upload
+            Nhấp hoặc kéo thả tệp vào đây để tải lên
           </p>
-          <p className="ant-upload-hint">
-            Support for a single or bulk upload.
-          </p>
+          <p className="ant-upload-hint">Hỗ trợ tải đơn hoặc nhiều tệp.</p>
         </Upload.Dragger>
 
         {/* Display existing images in edit mode */}
         {existingImages.length > 0 && (
           <div style={{ marginTop: 16 }}>
-            <h4>Existing Images:</h4>
+            <h4>Hình ảnh hiện có:</h4>
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
               dataSource={existingImages}
@@ -461,10 +463,10 @@ export const PetForm: React.FC<PetFormProps> = ({
                         }}
                       />
                       <Popconfirm
-                        title="Are you sure to delete this image?"
+                        title="Bạn có chắc chắn muốn xóa hình ảnh này không?"
                         onConfirm={() => handleDeleteImage(imageId)}
-                        okText="Yes"
-                        cancelText="No"
+                        okText="Có"
+                        cancelText="Không"
                       >
                         <Button
                           type="primary"
@@ -472,7 +474,7 @@ export const PetForm: React.FC<PetFormProps> = ({
                           icon={<DeleteOutlined />}
                           size="small"
                         >
-                          Delete
+                          Xóa
                         </Button>
                       </Popconfirm>
                     </Space>
@@ -486,7 +488,7 @@ export const PetForm: React.FC<PetFormProps> = ({
         {/* Display uploaded files in create mode */}
         {fileList.length > 0 && !petId && (
           <div style={{ marginTop: 16 }}>
-            <h4>Images to upload:</h4>
+            <h4>Hình ảnh sẽ tải lên:</h4>
             <List
               grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4, xxl: 6 }}
               dataSource={fileList}
@@ -508,7 +510,7 @@ export const PetForm: React.FC<PetFormProps> = ({
                         setFileList(fileList.filter((f) => f !== file))
                       }
                     >
-                      Remove
+                      Gỡ
                     </Button>
                   </Space>
                 </List.Item>
@@ -524,7 +526,7 @@ export const PetForm: React.FC<PetFormProps> = ({
           htmlType="submit"
           loading={uploadingProp || uploading || mutation?.status === "pending"}
         >
-          Save
+          Lưu
         </Button>
       </Form.Item>
     </Form>

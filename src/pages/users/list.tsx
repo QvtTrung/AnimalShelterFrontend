@@ -166,12 +166,28 @@ export const UserList: React.FC = () => {
     setFilters(newFilters);
   };
 
+  // Status mapping
+  const statusMap: Record<string, string> = {
+    active: "Hoạt động",
+    inactive: "Không hoạt động",
+    suspended: "Đã đình chỉ",
+    draft: "Nháp",
+    archived: "Đã lưu trữ",
+  };
+
+  // Role mapping
+  const roleMap: Record<string, string> = {
+    User: "Người dùng",
+    Staff: "Nhân viên",
+    Administrator: "Quản trị viên",
+  };
+
   return (
-    <List headerButtons={<CreateButton type="primary" />}>
+    <List title="Người dùng" headerButtons={<CreateButton type="primary" />}>
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}
-          placeholder="Search by email, first name, or last name"
+          placeholder="Tìm kiếm theo email, tên hoặc họ"
           allowClear
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
@@ -179,27 +195,27 @@ export const UserList: React.FC = () => {
         />
 
         <Select
-          placeholder="Status"
+          placeholder="Trạng thái"
           allowClear
           style={{ width: 160 }}
           value={status}
           onChange={(v) => handleStatusChange(v as string | undefined)}
           options={[
-            { value: "active", label: "Active" },
-            { value: "inactive", label: "Inactive" },
+            { value: "active", label: "Hoạt động" },
+            { value: "inactive", label: "Không hoạt động" },
           ]}
         />
 
         <Select
-          placeholder="Role"
+          placeholder="Vai trò"
           allowClear
           style={{ width: 160 }}
           value={role}
           onChange={(v) => handleRoleChange(v as string | undefined)}
           options={[
-            { value: "Administrator", label: "Administrator" },
-            { value: "Staff", label: "Staff" },
-            { value: "User", label: "User" },
+            { value: "Administrator", label: "Quản trị viên" },
+            { value: "Staff", label: "Nhân viên" },
+            { value: "User", label: "Người dùng" },
           ]}
         />
       </Space>
@@ -212,7 +228,7 @@ export const UserList: React.FC = () => {
           ...tableProps.pagination,
           position: ["bottomCenter"],
           showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
+            `${range[0]}-${range[1]} trong ${total} mục`,
         }}
       >
         <Table.Column<IUser>
@@ -223,42 +239,42 @@ export const UserList: React.FC = () => {
         />
         <Table.Column<IUser>
           dataIndex="first_name"
-          title="First Name"
+          title="Tên"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
         />
         <Table.Column<IUser>
           dataIndex="last_name"
-          title="Last Name"
+          title="Họ"
           render={(v) => <TextField value={v ?? "-"} />}
           sorter
         />
         <Table.Column<IUser>
           dataIndex="phone_number"
-          title="Phone Number"
+          title="Số điện thoại"
           render={(v) => <TextField value={v ?? "-"} />}
         />
         <Table.Column<IUser>
           dataIndex="role"
-          title="Role"
+          title="Vai trò"
           render={(value) => {
             // If role is available, display it
-            return value || "Not assigned";
+            return roleMap[value] || value || "Chưa gán";
           }}
         />
         <Table.Column<IUser>
           dataIndex="status"
-          title="Status"
+          title="Trạng thái"
           render={(value) => {
             let color = "default";
             if (value === "active") color = "green";
             else if (value === "inactive") color = "red";
 
-            return <Tag color={color}>{value}</Tag>;
+            return <Tag color={color}>{statusMap[value] || value}</Tag>;
           }}
         />
         <Table.Column<IUser>
-          title="Actions"
+          title="Thao tác"
           dataIndex="actions"
           render={(_, record) => (
             <Space>

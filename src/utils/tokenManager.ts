@@ -12,9 +12,16 @@ let refreshIntervalId: NodeJS.Timeout | null = null;
  */
 export async function refreshAccessToken(): Promise<boolean> {
   try {
+    const refresh_token = localStorage.getItem("refresh_token");
+    
+    if (!refresh_token) {
+      console.error("No refresh token available");
+      return false;
+    }
+
     const response = await axios.post(
       `${API_URL}/auth/refresh`,
-      {},
+      { refresh_token },
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -23,10 +30,14 @@ export async function refreshAccessToken(): Promise<boolean> {
       }
     );
 
-    const { directusUser, user, token } = response.data.data;
+    const { directusUser, user, token, refresh_token: newRefreshToken } = response.data.data;
 
     if (token) {
       localStorage.setItem("token", token);
+
+      if (newRefreshToken) {
+        localStorage.setItem("refresh_token", newRefreshToken);
+      }
 
       if (directusUser) {
         localStorage.setItem("directusUser", JSON.stringify(directusUser));
@@ -36,7 +47,6 @@ export async function refreshAccessToken(): Promise<boolean> {
         localStorage.setItem("appUser", JSON.stringify(user));
       }
 
-      console.log("Token refreshed successfully");
       return true;
     }
 
@@ -64,20 +74,15 @@ export function startTokenRefresh() {
       const success = await refreshAccessToken();
       
       if (!success) {
-        // If refresh fails, stop trying and redirect to login
+        // If refresh fails, stop trying but don't force logout
+        // Let the authProvider and axios interceptors handle authentication
         stopTokenRefresh();
-        localStorage.removeItem("token");
-        localStorage.removeItem("directusUser");
-        localStorage.removeItem("appUser");
-        window.location.href = "/login";
       }
     } else {
       // No token, stop refreshing
       stopTokenRefresh();
     }
   }, TOKEN_REFRESH_INTERVAL);
-
-  console.log("Token refresh interval started");
 }
 
 /**

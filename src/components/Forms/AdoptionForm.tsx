@@ -80,9 +80,9 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
     >
       <Form.Item
-        label="Pet"
+        label="Thú cưng"
         name="pet_id"
-        rules={[{ required: true, message: "Please select a pet" }]}
+        rules={[{ required: true, message: "Vui lòng chọn thú cưng" }]}
         getValueProps={(value) => {
           // Handle both object (from populated query) and string (ID only) values
           if (typeof value === "object" && value !== null) {
@@ -94,7 +94,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
         <Select
           {...petSelectProps}
           options={petOptions} // Use custom options that include current pet
-          placeholder="Select a pet"
+          placeholder="Chọn thú cưng"
           showSearch
           filterOption={(input, option) => {
             const label = String(option?.label ?? "");
@@ -104,9 +104,9 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       </Form.Item>
 
       <Form.Item
-        label="User"
+        label="Người dùng"
         name="user_id"
-        rules={[{ required: true, message: "Please select a user" }]}
+        rules={[{ required: true, message: "Vui lòng chọn người dùng" }]}
         getValueProps={(value) => {
           // Handle both object (from populated query) and string (ID only) values
           if (typeof value === "object" && value !== null) {
@@ -117,7 +117,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       >
         <Select
           {...userSelectProps}
-          placeholder="Select a user"
+          placeholder="Chọn người dùng"
           showSearch
           filterOption={(input, option) => {
             const label = String(option?.label ?? "");
@@ -127,7 +127,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       </Form.Item>
 
       <Form.Item
-        label="Status"
+        label="Trạng thái"
         name="status"
         rules={[
           {
@@ -138,23 +138,23 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
         <Select
           options={[
             {
-              label: "Pending",
+              label: "Chờ xử lý",
               value: "pending",
             },
             {
-              label: "Confirming",
+              label: "Đang xác nhận",
               value: "confirming",
             },
             {
-              label: "Confirmed",
+              label: "Đã xác nhận",
               value: "confirmed",
             },
             {
-              label: "Completed",
+              label: "Hoàn thành",
               value: "completed",
             },
             {
-              label: "Cancelled",
+              label: "Đã hủy",
               value: "cancelled",
             },
           ]}
@@ -162,7 +162,7 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
       </Form.Item>
 
       <Form.Item
-        label="Appointment Date"
+        label="Ngày hẹn"
         name="appointment_date"
         getValueProps={(value) => ({
           value: value ? dayjs(value) : undefined,
@@ -176,13 +176,13 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
         />
       </Form.Item>
 
-      <Form.Item label="Notes" name="notes">
-        <Input.TextArea rows={4} placeholder="Additional notes..." />
+      <Form.Item label="Ghi chú" name="notes">
+        <Input.TextArea rows={4} placeholder="Ghi chú bổ sung..." />
       </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" {...saveButtonProps}>
-          Save
+          Lưu
         </Button>
       </Form.Item>
     </Form>

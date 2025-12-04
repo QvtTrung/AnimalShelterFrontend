@@ -354,7 +354,14 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       </Form.Item>
 
       <Form.Item label="Loài" name="species" rules={[{ required: true }]}>
-        <Input placeholder="Ví dụ: Chó, Mèo, Chim" />
+        <Select
+          placeholder="Chọn loài động vật"
+          options={[
+            { label: "Chó", value: "Dog" },
+            { label: "Mèo", value: "Cat" },
+            { label: "Khác", value: "Other" },
+          ]}
+        />
       </Form.Item>
 
       <Form.Item label="Loại" name="type" rules={[{ required: true }]}>

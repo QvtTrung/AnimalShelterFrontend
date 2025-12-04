@@ -50,7 +50,7 @@ export interface IAdoption {
 export interface IReport {
   id: string;
   status: "pending" | "assigned" | "resolved";
-  species: string;
+  species: "Dog" | "Cat" | "Other";
   description: string;
   location: string;
   title: string;

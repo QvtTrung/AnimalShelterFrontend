@@ -15,7 +15,15 @@ import {
   Spin,
   Select,
   Alert,
+  Table,
+  Button,
 } from "antd";
+import { ClockCircleOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
+
 import "leaflet/dist/leaflet.css";
 import { useState, useRef } from "react";
 import L from "leaflet";
@@ -24,7 +32,6 @@ import {
   DashboardStats,
   DashboardTimeline,
   DashboardMapHandle,
-  DashboardNotifications,
 } from "../components/Dashboard";
 
 // Fix for default markers in react-leaflet
@@ -39,7 +46,7 @@ const { Title, Text } = Typography;
 
 export const DashboardPage: React.FC = () => {
   const { data: user } = useGetIdentity({});
-  const { show } = useNavigation();
+  const { show, list } = useNavigation();
   const [timeRange, setTimeRange] = useState("week");
   const mapRef = useRef<DashboardMapHandle>(null);
 
@@ -58,6 +65,28 @@ export const DashboardPage: React.FC = () => {
   });
 
   const recentNotifications = notificationsResult?.result?.data || [];
+
+  // Fetch recent activities for the activities table
+  const activitiesResult = useCustom({
+    url: `${import.meta.env.VITE_API_URL}/activities/recent`,
+    method: "get",
+    config: {
+      query: {
+        limit: 10,
+      },
+    },
+  });
+
+  const activitiesData = activitiesResult?.query?.data;
+  let recentActivities: any[] = [];
+  if (activitiesData) {
+    const responseData = (activitiesData as any).data || activitiesData;
+    if (Array.isArray(responseData)) {
+      recentActivities = responseData;
+    } else if (responseData.data && Array.isArray(responseData.data)) {
+      recentActivities = responseData.data;
+    }
+  }
 
   // Fetch dashboard analytics using useCustom hook
   const customResult = useCustom({
@@ -209,16 +238,119 @@ export const DashboardPage: React.FC = () => {
             onShowReport={(id) => show("reports", id)}
             onShowRescue={(id) => show("rescues", id)}
             onShowAdoption={(id) => show("adoptions", id)}
-            onReportClick={(id) => mapRef.current?.flyToReport(id)}
-            onRescueClick={(id, reports) =>
-              mapRef.current?.flyToRescue(id, reports)
-            }
+            onReportClick={(id) => {
+              if (mapRef.current) {
+                mapRef.current.flyToReport(id);
+              }
+            }}
+            onRescueClick={(id, reports) => {
+              if (mapRef.current) {
+                mapRef.current.flyToRescue(id, reports);
+              }
+            }}
           />
         </Col>
 
-        {/* Notifications Section */}
+        {/* Activities Section */}
         <Col xs={24}>
-          <DashboardNotifications notifications={recentNotifications} />
+          <Card
+            title={
+              <Space>
+                <ClockCircleOutlined
+                  style={{ color: "#8b5cf6", fontSize: "1.25rem" }}
+                />
+                <Title
+                  level={4}
+                  style={{ margin: 0, fontFamily: "Inter, sans-serif" }}
+                >
+                  Hoạt động gần đây
+                </Title>
+              </Space>
+            }
+            style={{
+              borderRadius: "1rem",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+            extra={
+              <Button
+                type="link"
+                onClick={() => list("activities")}
+                style={{ padding: 0 }}
+              >
+                Xem tất cả
+              </Button>
+            }
+          >
+            <Table
+              dataSource={recentActivities}
+              columns={[
+                {
+                  title: "Hành động",
+                  dataIndex: "action",
+                  key: "action",
+                  width: 150,
+                  render: (action: string) => {
+                    const actionLabels: Record<
+                      string,
+                      { label: string; color: string }
+                    > = {
+                      user_registered: { label: "Đăng ký", color: "blue" },
+                      report_created: { label: "Báo cáo mới", color: "orange" },
+                      adoption_requested: {
+                        label: "Yêu cầu nhận nuôi",
+                        color: "green",
+                      },
+                      report_claimed: {
+                        label: "Nhận báo cáo",
+                        color: "purple",
+                      },
+                      rescue_status_updated: {
+                        label: "Cập nhật cứu hộ",
+                        color: "cyan",
+                      },
+                      adoption_status_updated: {
+                        label: "Cập nhật nhận nuôi",
+                        color: "magenta",
+                      },
+                    };
+                    const config = actionLabels[action] || {
+                      label: action,
+                      color: "default",
+                    };
+                    return <Tag color={config.color}>{config.label}</Tag>;
+                  },
+                },
+                {
+                  title: "Người thực hiện",
+                  dataIndex: "actor_name",
+                  key: "actor_name",
+                  width: 150,
+                  render: (name: string) => <Text>{name || "Hệ thống"}</Text>,
+                },
+                {
+                  title: "Mô tả",
+                  dataIndex: "description",
+                  key: "description",
+                  ellipsis: true,
+                },
+                {
+                  title: "Thời gian",
+                  dataIndex: "date_created",
+                  key: "date_created",
+                  width: 120,
+                  render: (date: string) => (
+                    <Text type="secondary" style={{ fontSize: "0.875rem" }}>
+                      {dayjs(date).fromNow()}
+                    </Text>
+                  ),
+                },
+              ]}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              locale={{ emptyText: "Không có hoạt động gần đây" }}
+            />
+          </Card>
         </Col>
 
         {/* User Info Section */}

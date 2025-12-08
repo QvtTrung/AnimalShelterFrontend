@@ -15,6 +15,7 @@ import {
   FileTextOutlined,
   SafetyOutlined,
   BellOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons";
 
 import { dataProvider } from "./providers/dataProvider";
@@ -55,6 +56,7 @@ import {
   RescueCreate,
 } from "../src/pages/rescues";
 import { NotificationList, NotificationShow } from "../src/pages/notifications";
+import { ActivityList, ActivityShow } from "../src/pages/activities";
 import { ProfilePage } from "../src/pages/profile";
 import { DashboardPage } from "../src/pages/dashboard";
 import { RegisterPage } from "../src/pages/register";
@@ -172,6 +174,15 @@ const AppContent: React.FC = () => {
                   icon: <BellOutlined />,
                 },
               },
+              {
+                name: "activities",
+                list: "/activities",
+                show: "/activities/show/:id",
+                meta: {
+                  label: "Hoạt động",
+                  icon: <ClockCircleOutlined />,
+                },
+              },
             ]}
             notificationProvider={useNotificationProvider}
             options={{
@@ -241,6 +252,10 @@ const AppContent: React.FC = () => {
                 <Route path="/notifications">
                   <Route index element={<NotificationList />} />
                   <Route path="show/:id" element={<NotificationShow />} />
+                </Route>
+                <Route path="/activities">
+                  <Route index element={<ActivityList />} />
+                  <Route path="show/:id" element={<ActivityShow />} />
                 </Route>
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>

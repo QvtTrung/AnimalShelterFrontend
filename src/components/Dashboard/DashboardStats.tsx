@@ -91,7 +91,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
             height: "100%",
           }}
-          bodyStyle={{ padding: "20px" }}
+          styles={{ body: { padding: "20px" } }}
         >
           <Space direction="vertical" size="small" style={{ width: "100%" }}>
             <div
@@ -214,7 +214,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
             height: "100%",
           }}
-          bodyStyle={{ padding: "20px" }}
+          styles={{ body: { padding: "20px" } }}
         >
           <Space direction="vertical" size="small" style={{ width: "100%" }}>
             <div
@@ -334,7 +334,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
             height: "100%",
           }}
-          bodyStyle={{ padding: "20px" }}
+          styles={{ body: { padding: "20px" } }}
         >
           <Space direction="vertical" size="small" style={{ width: "100%" }}>
             <div

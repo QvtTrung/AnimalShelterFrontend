@@ -1,7 +1,7 @@
 import React from "react";
 import { useList, useUpdate } from "@refinedev/core";
 import { List, useTable } from "@refinedev/antd";
-import { Table, Space, Button, Tag, Typography } from "antd";
+import { Table, Space, Button, Tag, Typography, Select, Form } from "antd";
 import { EyeOutlined, CheckOutlined } from "@ant-design/icons";
 import type { INotification } from "../../interfaces";
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ dayjs.extend(relativeTime);
 const { Text } = Typography;
 
 export const NotificationList: React.FC = () => {
-  const { tableProps } = useTable<INotification>({
+  const { tableProps, searchFormProps } = useTable<INotification>({
     syncWithLocation: true,
     sorters: {
       initial: [
@@ -21,6 +21,27 @@ export const NotificationList: React.FC = () => {
           order: "desc",
         },
       ],
+    },
+    onSearch: (params: any) => {
+      const filters: any[] = [];
+
+      if (params.type) {
+        filters.push({
+          field: "type",
+          operator: "eq",
+          value: params.type,
+        });
+      }
+
+      if (params.is_read !== undefined) {
+        filters.push({
+          field: "is_read",
+          operator: "eq",
+          value: params.is_read === "true",
+        });
+      }
+
+      return filters;
     },
   });
 
@@ -70,6 +91,48 @@ export const NotificationList: React.FC = () => {
 
   return (
     <List title="Thông báo">
+      <Form {...searchFormProps} layout="inline" style={{ marginBottom: 16 }}>
+        <Form.Item name="type" label="Loại">
+          <Select
+            allowClear
+            placeholder="Lọc theo loại"
+            style={{ width: 150 }}
+          >
+            <Select.Option value="adoption">Nhận nuôi</Select.Option>
+            <Select.Option value="rescue">Cứu hộ</Select.Option>
+            <Select.Option value="report">Báo cáo</Select.Option>
+            <Select.Option value="system">Hệ thống</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item name="is_read" label="Trạng thái">
+          <Select
+            allowClear
+            placeholder="Lọc theo trạng thái"
+            style={{ width: 150 }}
+          >
+            <Select.Option value="false">Chưa đọc</Select.Option>
+            <Select.Option value="true">Đã đọc</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Lọc
+            </Button>
+            <Button
+              onClick={() => {
+                searchFormProps.form?.resetFields();
+                searchFormProps.form?.submit();
+              }}
+            >
+              Xóa lọc
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="is_read"

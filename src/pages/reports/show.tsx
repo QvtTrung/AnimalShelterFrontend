@@ -109,12 +109,20 @@ export const ReportShow = () => {
     critical: "Nghiêm trọng",
   };
 
+  const speciesMap: Record<string, string> = {
+    Dog: "Chó",
+    Cat: "Mèo",
+    Other: "Khác",
+  };
+
   return (
     <Show isLoading={isLoading}>
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
         <Descriptions.Item label="Tiêu đề">{record?.title}</Descriptions.Item>
-        <Descriptions.Item label="Loài">{record?.species}</Descriptions.Item>
+        <Descriptions.Item label="Loài">
+          {speciesMap[record?.species || ""] || record?.species}
+        </Descriptions.Item>
         <Descriptions.Item label="Loại">
           <Tag color={getTypeColor(record?.type || "")}>{record?.type}</Tag>
         </Descriptions.Item>

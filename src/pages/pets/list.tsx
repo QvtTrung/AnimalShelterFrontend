@@ -132,6 +132,12 @@ export const PetList: React.FC = () => {
     years: "năm",
   };
 
+  const speciesMap: Record<string, string> = {
+    Dog: "Chó",
+    Cat: "Mèo",
+    Other: "Khác",
+  };
+
   return (
     <List title="Thú cưng" headerButtons={<CreateButton type="primary" />}>
       <Space wrap style={{ marginBottom: 16 }}>
@@ -224,7 +230,7 @@ export const PetList: React.FC = () => {
         <Table.Column<IPet>
           dataIndex="species"
           title="Loài"
-          render={(v) => <TextField value={v ?? "-"} />}
+          render={(v) => <TextField value={speciesMap[v] || v || "-"} />}
         />
         <Table.Column<IPet>
           dataIndex="age"

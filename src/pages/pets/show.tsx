@@ -111,14 +111,22 @@ export const PetShow = () => {
     deceased: "Đã chết",
   };
 
+  const speciesMap: Record<string, string> = {
+    Dog: "Chó",
+    Cat: "Mèo",
+    Other: "Khác",
+  };
+
   return (
     <Show isLoading={isLoading}>
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
         <Descriptions.Item label="Tên">{record?.name}</Descriptions.Item>
-        <Descriptions.Item label="Loài">{record?.species}</Descriptions.Item>
+        <Descriptions.Item label="Loài">
+          {speciesMap[record?.species || ""] || record?.species}
+        </Descriptions.Item>
         <Descriptions.Item label="Mô tả">
-          {record?.description}
+          <div style={{ whiteSpace: "pre-wrap" }}>{record?.description}</div>
         </Descriptions.Item>
         <Descriptions.Item label="Tuổi">
           {record?.age} {ageUnitMap[record?.age_unit || ""] || record?.age_unit}

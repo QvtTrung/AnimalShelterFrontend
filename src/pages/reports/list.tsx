@@ -115,6 +115,12 @@ export const ReportList = () => {
     critical: "Nghiêm trọng",
   };
 
+  const speciesMap: Record<string, string> = {
+    Dog: "Chó",
+    Cat: "Mèo",
+    Other: "Khác",
+  };
+
   return (
     <List title="Báo cáo" createButtonProps={{ children: "Tạo báo cáo" }}>
       <Space wrap style={{ marginBottom: 16 }}>
@@ -225,7 +231,13 @@ export const ReportList = () => {
         />
 
         {/* SPECIES */}
-        <Table.Column title="Loài" dataIndex="species" width={100} sorter />
+        <Table.Column
+          title="Loài"
+          dataIndex="species"
+          width={100}
+          sorter
+          render={(value) => speciesMap[value] || value || "-"}
+        />
 
         {/* LOCATION */}
         <Table.Column

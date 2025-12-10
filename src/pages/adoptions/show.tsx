@@ -244,6 +244,52 @@ export const AdoptionShow = () => {
           {record?.notes || "-"}
         </Descriptions.Item>
 
+        {/* Application Form Information */}
+        {(record?.full_name || record?.phone_number || record?.email) && (
+          <>
+            <Descriptions.Item label="Họ và tên">
+              {record?.full_name || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Số điện thoại">
+              {record?.phone_number || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email liên hệ">
+              {record?.email || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Địa chỉ">
+              {record?.address || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Loại nhà ở">
+              {record?.housing_type
+                ? record.housing_type === "apartment"
+                  ? "Chung cư"
+                  : record.housing_type === "house"
+                  ? "Nhà riêng"
+                  : "Biệt thự"
+                : "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Diện tích">
+              {record?.housing_area ? `${record.housing_area} m²` : "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Có sân vườn">
+              {record?.has_yard !== undefined
+                ? record.has_yard
+                  ? "Có"
+                  : "Không"
+                : "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Kinh nghiệm nuôi thú cưng">
+              {record?.pet_experience || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Lý do nhận nuôi">
+              {record?.adoption_reason || "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Cam kết chăm sóc">
+              {record?.care_commitment || "-"}
+            </Descriptions.Item>
+          </>
+        )}
+
         <Descriptions.Item label="Ngày tạo">
           {record?.date_created
             ? new Date(record.date_created).toLocaleString()

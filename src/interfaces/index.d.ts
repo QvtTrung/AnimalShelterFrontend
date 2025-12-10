@@ -45,6 +45,18 @@ export interface IAdoption {
   confirmation_expires_at?: string;
   pets?: IPet;  // Legacy field name for backwards compatibility
   user?: IUser;  // Legacy field name for backwards compatibility
+  
+  // Application form fields
+  full_name?: string;
+  phone_number?: string;
+  email?: string;
+  address?: string;
+  housing_type?: "apartment" | "house" | "villa";
+  housing_area?: number;
+  has_yard?: boolean;
+  pet_experience?: string;
+  adoption_reason?: string;
+  care_commitment?: string;
 }
 
 export interface IReport {

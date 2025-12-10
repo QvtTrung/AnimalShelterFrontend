@@ -149,7 +149,7 @@ export const RescueProgressTracker: React.FC<RescueProgressTrackerProps> = ({
                   fontFamily: "Inter, sans-serif",
                 }}
               >
-                Rescue Progress Tracker
+                Tiến độ cứu hộ
               </span>
             </div>
             <Tag

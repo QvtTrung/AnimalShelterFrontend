@@ -6,7 +6,7 @@ import {
   useMany,
   useCustomMutation,
 } from "@refinedev/core";
-import { Show } from "@refinedev/antd";
+import { Show, ListButton, EditButton } from "@refinedev/antd";
 import {
   Typography,
   Tag,
@@ -229,7 +229,20 @@ export const RescueShow = () => {
 
   /* ----------------------------------------------------------------------- */
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Cứu hộ"
+      headerButtons={({ listButtonProps, editButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Cứu hộ</ListButton>
+          )}
+          {editButtonProps && (
+            <EditButton {...editButtonProps}>Chỉnh sửa</EditButton>
+          )}
+        </>
+      )}
+    >
       <div className="bg-gray-50 rounded-xl">
         <Row gutter={[16, 16]}>
           {/* --------------------------- MAP ----------------------------------- */}

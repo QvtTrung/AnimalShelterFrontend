@@ -93,11 +93,7 @@ export const NotificationList: React.FC = () => {
     <List title="Thông báo">
       <Form {...searchFormProps} layout="inline" style={{ marginBottom: 16 }}>
         <Form.Item name="type" label="Loại">
-          <Select
-            allowClear
-            placeholder="Lọc theo loại"
-            style={{ width: 150 }}
-          >
+          <Select allowClear placeholder="Lọc theo loại" style={{ width: 150 }}>
             <Select.Option value="adoption">Nhận nuôi</Select.Option>
             <Select.Option value="rescue">Cứu hộ</Select.Option>
             <Select.Option value="report">Báo cáo</Select.Option>
@@ -133,30 +129,50 @@ export const NotificationList: React.FC = () => {
         </Form.Item>
       </Form>
 
-      <Table {...tableProps} rowKey="id">
+      <Table
+        {...tableProps}
+        rowKey="id"
+        pagination={{
+          ...tableProps.pagination,
+          position: ["bottomCenter"],
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} trong tổng số ${total} mục`,
+        }}
+        scroll={{ x: 1200 }}
+      >
         <Table.Column
           dataIndex="is_read"
           title="Trạng thái"
+          width={120}
           render={(value) => (
             <Tag color={value ? "green" : "orange"}>
               {value ? "Đã đọc" : "Chưa đọc"}
             </Tag>
           )}
-          width={120}
         />
         <Table.Column
           dataIndex="type"
           title="Loại"
+          width={120}
           render={(value) => (
             <Tag color={getTypeColor(value)}>{getTypeLabel(value)}</Tag>
           )}
-          width={120}
         />
         <Table.Column
           dataIndex="title"
           title="Tiêu đề"
+          width={200}
+          ellipsis={{ showTitle: false }}
           render={(value, record: INotification) => (
-            <div>
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               <Text strong={!record.is_read}>{value}</Text>
             </div>
           )}
@@ -164,23 +180,33 @@ export const NotificationList: React.FC = () => {
         <Table.Column
           dataIndex="message"
           title="Nội dung"
+          ellipsis={{ showTitle: false }}
           render={(value) => (
-            <Text ellipsis={{ tooltip: value }} style={{ maxWidth: 300 }}>
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {value}
-            </Text>
+            </div>
           )}
         />
         <Table.Column
           dataIndex="date_created"
           title="Thời gian"
+          width={150}
           render={(value) => (
             <Text type="secondary">{dayjs(value).fromNow()}</Text>
           )}
-          width={150}
         />
         <Table.Column
           title="Hành động"
           dataIndex="actions"
+          width={220}
+          fixed="right"
           render={(_, record: INotification) => (
             <Space>
               <Button
@@ -203,7 +229,6 @@ export const NotificationList: React.FC = () => {
               )}
             </Space>
           )}
-          width={200}
         />
       </Table>
     </List>

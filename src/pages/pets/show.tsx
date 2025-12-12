@@ -2,7 +2,7 @@ import { useShow, useCustom } from "@refinedev/core";
 import { useApi } from "../../hooks/useApi";
 import { useState, useEffect } from "react";
 
-import { Show } from "@refinedev/antd";
+import { Show, ListButton, EditButton } from "@refinedev/antd";
 
 import { Typography, Tag, Descriptions, List, Image, Space } from "antd";
 
@@ -118,7 +118,20 @@ export const PetShow = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Thú cưng"
+      headerButtons={({ listButtonProps, editButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Thú cưng</ListButton>
+          )}
+          {editButtonProps && (
+            <EditButton {...editButtonProps}>Chỉnh sửa</EditButton>
+          )}
+        </>
+      )}
+    >
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
         <Descriptions.Item label="Tên">{record?.name}</Descriptions.Item>

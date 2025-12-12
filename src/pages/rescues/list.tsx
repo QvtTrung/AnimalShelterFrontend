@@ -262,7 +262,15 @@ export const RescueList = () => {
   };
 
   return (
-    <List title="Cứu hộ" headerButtons={<CreateButton type="primary" />}>
+    <List
+      title="Cứu hộ"
+      headerButtons={
+        <CreateButton type="primary">Tạo Kế hoạch cứu hộ</CreateButton>
+      }
+      createButtonProps={{
+        children: "Tạo Kế hoạch cứu hộ",
+      }}
+    >
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}

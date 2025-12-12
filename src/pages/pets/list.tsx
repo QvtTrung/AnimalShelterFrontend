@@ -139,7 +139,13 @@ export const PetList: React.FC = () => {
   };
 
   return (
-    <List title="Thú cưng" headerButtons={<CreateButton type="primary" />}>
+    <List
+      title="Thú cưng"
+      headerButtons={<CreateButton type="primary">Thêm Thú Cưng</CreateButton>}
+      createButtonProps={{
+        children: "Thêm Thú Cưng",
+      }}
+    >
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}

@@ -1,5 +1,5 @@
 // RescueEdit.tsx
-import { Edit, useForm } from "@refinedev/antd";
+import { Edit, useForm, ListButton } from "@refinedev/antd";
 import { useParsed, useShow } from "@refinedev/core";
 import { RescueForm } from "../../components/Forms/RescueForm";
 import type { IRescue } from "../../interfaces";
@@ -48,11 +48,18 @@ export const RescueEdit = () => {
   }
 
   return (
-    <Edit saveButtonProps={{ hidden: true }}>
-      <RescueForm
-        formProps={formProps}
-        initialValues={rescueData}
-      />
+    <Edit
+      saveButtonProps={{ hidden: true }}
+      title="Chỉnh sửa Cứu hộ"
+      headerButtons={({ listButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Cứu hộ</ListButton>
+          )}
+        </>
+      )}
+    >
+      <RescueForm formProps={formProps} initialValues={rescueData} />
     </Edit>
   );
 };

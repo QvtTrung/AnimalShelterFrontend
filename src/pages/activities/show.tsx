@@ -1,5 +1,11 @@
 import React from "react";
-import { Show, TextField, DateField, TagField } from "@refinedev/antd";
+import {
+  Show,
+  TextField,
+  DateField,
+  TagField,
+  ListButton,
+} from "@refinedev/antd";
 import { useShow } from "@refinedev/core";
 import { Typography, Descriptions, Card, Space, Tag } from "antd";
 
@@ -75,7 +81,17 @@ const ActivityShow: React.FC = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Hoạt động"
+      headerButtons={({ listButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Hoạt động</ListButton>
+          )}
+        </>
+      )}
+    >
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <Card>
           <Descriptions title="Activity Information" bordered column={2}>

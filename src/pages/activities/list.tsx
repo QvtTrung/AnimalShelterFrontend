@@ -7,6 +7,7 @@ import {
   TextField,
 } from "@refinedev/antd";
 import { Table, Space, Select, DatePicker, Form, Button } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 import type { BaseRecord } from "@refinedev/core";
 import dayjs from "dayjs";
 
@@ -95,7 +96,7 @@ const ActivityList: React.FC = () => {
   };
 
   return (
-    <List>
+    <List title="Hoạt động">
       <Form {...searchFormProps} layout="inline" style={{ marginBottom: 16 }}>
         <Form.Item name="action" label="Action">
           <Select
@@ -155,10 +156,23 @@ const ActivityList: React.FC = () => {
         </Form.Item>
       </Form>
 
-      <Table {...tableProps} rowKey="id">
+      <Table
+        {...tableProps}
+        rowKey="id"
+        pagination={{
+          ...tableProps.pagination,
+          position: ["bottomCenter"],
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} trong tổng số ${total} mục`,
+        }}
+        scroll={{ x: 1200 }}
+        style={{ tableLayout: "fixed" }}
+      >
         <Table.Column
           dataIndex="date_created"
           title="Date"
+          width={180}
           render={(value) => (
             <DateField value={value} format="YYYY-MM-DD HH:mm:ss" />
           )}
@@ -169,6 +183,7 @@ const ActivityList: React.FC = () => {
         <Table.Column
           dataIndex="action"
           title="Action"
+          width={180}
           render={(value) => (
             <TagField
               value={value.replace(/_/g, " ")}
@@ -180,12 +195,26 @@ const ActivityList: React.FC = () => {
         <Table.Column
           dataIndex="actor_name"
           title="Actor"
-          render={(value) => <TextField value={value || "System"} />}
+          width={150}
+          ellipsis={{ showTitle: false }}
+          render={(value) => (
+            <div
+              title={value || "System"}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value || "System"}
+            </div>
+          )}
         />
 
         <Table.Column
           dataIndex="target_type"
           title="Target Type"
+          width={120}
           render={(value) =>
             value ? (
               <TagField value={value} color={getTargetTypeColor(value)} />
@@ -195,14 +224,39 @@ const ActivityList: React.FC = () => {
           }
         />
 
-        <Table.Column dataIndex="description" title="Description" ellipsis />
+        <Table.Column
+          dataIndex="description"
+          title="Description"
+          ellipsis={{ showTitle: false }}
+          render={(value) => (
+            <div
+              title={value}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {value}
+            </div>
+          )}
+        />
 
         <Table.Column
           title="Actions"
           dataIndex="actions"
+          width={120}
+          fixed="right"
           render={(_, record: ActivityLog) => (
             <Space>
-              <a href={`/activities/show/${record.id}`}>View Details</a>
+              <Button
+                type="link"
+                size="small"
+                icon={<EyeOutlined />}
+                href={`/activities/show/${record.id}`}
+              >
+                Xem
+              </Button>
             </Space>
           )}
         />

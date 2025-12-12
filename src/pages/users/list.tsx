@@ -183,7 +183,15 @@ export const UserList: React.FC = () => {
   };
 
   return (
-    <List title="Người dùng" headerButtons={<CreateButton type="primary" />}>
+    <List
+      title="Người dùng"
+      headerButtons={
+        <CreateButton type="primary">Thêm Người dùng</CreateButton>
+      }
+      createButtonProps={{
+        children: "Thêm Người dùng",
+      }}
+    >
       <Space wrap style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}

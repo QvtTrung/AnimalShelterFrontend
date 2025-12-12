@@ -1,7 +1,7 @@
 import React from "react";
 import { useShow } from "@refinedev/core";
 
-import { Show } from "@refinedev/antd";
+import { Show, ListButton, EditButton } from "@refinedev/antd";
 
 import { Typography, Tag, Descriptions } from "antd";
 
@@ -41,7 +41,20 @@ export const UserShow = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Người dùng"
+      headerButtons={({ listButtonProps, editButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Người dùng</ListButton>
+          )}
+          {editButtonProps && (
+            <EditButton {...editButtonProps}>Chỉnh sửa</EditButton>
+          )}
+        </>
+      )}
+    >
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
         <Descriptions.Item label="Email">{record?.email}</Descriptions.Item>

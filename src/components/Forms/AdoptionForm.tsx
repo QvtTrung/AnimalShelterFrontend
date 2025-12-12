@@ -176,6 +176,81 @@ export const AdoptionForm: React.FC<AdoptionFormProps> = ({
         />
       </Form.Item>
 
+      {/* Contact Information Section */}
+      <Form.Item label="Họ và tên" name="full_name">
+        <Input placeholder="Nhập họ và tên đầy đủ" maxLength={255} />
+      </Form.Item>
+
+      <Form.Item label="Số điện thoại" name="phone_number">
+        <Input placeholder="Nhập số điện thoại" maxLength={20} />
+      </Form.Item>
+
+      <Form.Item
+        label="Email"
+        name="email"
+        rules={[{ type: "email", message: "Email không hợp lệ" }]}
+      >
+        <Input placeholder="Nhập email liên hệ" maxLength={255} />
+      </Form.Item>
+
+      <Form.Item label="Địa chỉ" name="address">
+        <Input.TextArea
+          rows={2}
+          placeholder="Nhập địa chỉ chi tiết"
+          maxLength={500}
+        />
+      </Form.Item>
+
+      {/* Housing Information Section */}
+      <Form.Item label="Loại nhà ở" name="housing_type">
+        <Select
+          placeholder="Chọn loại nhà ở"
+          options={[
+            { label: "Chung cư", value: "apartment" },
+            { label: "Nhà riêng", value: "house" },
+            { label: "Biệt thự", value: "villa" },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="Diện tích nhà (m²)" name="housing_area">
+        <Input type="number" placeholder="Nhập diện tích" min={0} />
+      </Form.Item>
+
+      <Form.Item label="Có sân vườn" name="has_yard" valuePropName="checked">
+        <Select
+          options={[
+            { label: "Có", value: true },
+            { label: "Không", value: false },
+          ]}
+        />
+      </Form.Item>
+
+      {/* Experience Section */}
+      <Form.Item label="Kinh nghiệm nuôi thú cưng" name="pet_experience">
+        <Input.TextArea
+          rows={3}
+          placeholder="Mô tả kinh nghiệm nuôi thú cưng của bạn..."
+          maxLength={2000}
+        />
+      </Form.Item>
+
+      <Form.Item label="Lý do nhận nuôi" name="adoption_reason">
+        <Input.TextArea
+          rows={3}
+          placeholder="Vì sao bạn muốn nhận nuôi thú cưng này..."
+          maxLength={2000}
+        />
+      </Form.Item>
+
+      <Form.Item label="Cam kết chăm sóc" name="care_commitment">
+        <Input.TextArea
+          rows={3}
+          placeholder="Bạn cam kết sẽ chăm sóc thú cưng như thế nào..."
+          maxLength={2000}
+        />
+      </Form.Item>
+
       <Form.Item label="Ghi chú" name="notes">
         <Input.TextArea rows={4} placeholder="Ghi chú bổ sung..." />
       </Form.Item>

@@ -112,7 +112,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
                     fontFamily: "Inter, sans-serif",
                   }}
                 >
-                  Báo cáo hằng ngày
+                  Báo cáo
                 </span>
               </Space>
               <Space>
@@ -235,7 +235,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
                     fontFamily: "Inter, sans-serif",
                   }}
                 >
-                  Ca cứu hộ hằng ngày
+                  Cứu hộ
                 </span>
               </Space>
               <Space>
@@ -355,7 +355,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
                     fontFamily: "Inter, sans-serif",
                   }}
                 >
-                  Yêu cầu nhận nuôi mới
+                  Nhận nuôi
                 </span>
               </Space>
               <Space>

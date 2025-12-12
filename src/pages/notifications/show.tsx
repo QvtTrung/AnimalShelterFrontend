@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useShow, useUpdate, useNavigation } from "@refinedev/core";
-import { Show } from "@refinedev/antd";
+import { Show, ListButton } from "@refinedev/antd";
 import { Typography, Tag, Descriptions, Button, Space, Card } from "antd";
 import { CheckOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import type { INotification } from "../../interfaces";
@@ -80,7 +80,17 @@ export const NotificationShow: React.FC = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Thông báo"
+      headerButtons={({ listButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Thông báo</ListButton>
+          )}
+        </>
+      )}
+    >
       <Descriptions bordered column={1}>
         <Descriptions.Item label="Loại">
           <Tag color={getTypeColor(record?.type || "")}>

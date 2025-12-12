@@ -155,7 +155,7 @@ export const NotificationDropdown: React.FC = () => {
           }}
         >
           <Button type="link" block size="small" onClick={() => setOpen(false)}>
-            View all notifications
+            Xem tất cả thông báo
           </Button>
         </div>
       )}

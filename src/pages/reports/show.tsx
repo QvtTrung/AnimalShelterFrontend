@@ -1,6 +1,6 @@
 import { useShow } from "@refinedev/core";
 
-import { Show } from "@refinedev/antd";
+import { Show, ListButton, EditButton } from "@refinedev/antd";
 
 import { Typography, Tag, Descriptions, List, Image, Space } from "antd";
 
@@ -116,7 +116,20 @@ export const ReportShow = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Báo cáo"
+      headerButtons={({ listButtonProps, editButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Báo cáo</ListButton>
+          )}
+          {editButtonProps && (
+            <EditButton {...editButtonProps}>Chỉnh sửa</EditButton>
+          )}
+        </>
+      )}
+    >
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
         <Descriptions.Item label="Tiêu đề">{record?.title}</Descriptions.Item>

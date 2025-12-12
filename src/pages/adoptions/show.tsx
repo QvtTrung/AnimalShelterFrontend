@@ -1,6 +1,6 @@
 import { useShow, useCustomMutation } from "@refinedev/core";
 
-import { Show } from "@refinedev/antd";
+import { Show, ListButton, EditButton } from "@refinedev/antd";
 
 import {
   Typography,
@@ -173,7 +173,20 @@ export const AdoptionShow = () => {
   };
 
   return (
-    <Show isLoading={isLoading}>
+    <Show
+      isLoading={isLoading}
+      title="Chi tiết Nhận nuôi"
+      headerButtons={({ listButtonProps, editButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Nhận nuôi</ListButton>
+          )}
+          {editButtonProps && (
+            <EditButton {...editButtonProps}>Chỉnh sửa</EditButton>
+          )}
+        </>
+      )}
+    >
       <Descriptions bordered column={1}>
         <Descriptions.Item label="ID">{record?.id}</Descriptions.Item>
 

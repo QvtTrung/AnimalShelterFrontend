@@ -1,5 +1,5 @@
 // ReportEdit.tsx
-import { Edit, useForm } from "@refinedev/antd";
+import { Edit, useForm, ListButton } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
 import { ReportForm } from "../../components/Forms/ReportForm";
 
@@ -28,7 +28,17 @@ export const ReportEdit = () => {
   });
 
   return (
-    <Edit saveButtonProps={{ hidden: true }}>
+    <Edit
+      saveButtonProps={{ hidden: true }}
+      title="Chỉnh sửa Báo cáo"
+      headerButtons={({ listButtonProps }) => (
+        <>
+          {listButtonProps && (
+            <ListButton {...listButtonProps}>Báo cáo</ListButton>
+          )}
+        </>
+      )}
+    >
       <ReportForm formProps={formProps} reportId={id} />
     </Edit>
   );

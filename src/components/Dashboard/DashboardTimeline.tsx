@@ -539,7 +539,9 @@ export const DashboardTimeline: React.FC<DashboardTimelineProps> = ({
                     fontFamily: "Inter, sans-serif",
                   }}
                 >
-                  Adoption Application
+                  {adoption.pet_id?.name
+                    ? `Adoption application for ${adoption.pet_id.name}`
+                    : "Adoption Application"}
                 </Text>
               </div>
             </div>

@@ -199,14 +199,6 @@ export const AdoptionList = () => {
           )}
         />
         <Table.Column
-          dataIndex="appointment_date"
-          title="Ngày hẹn"
-          sorter
-          render={(value) =>
-            value ? new Date(value).toLocaleDateString() : "-"
-          }
-        />
-        <Table.Column
           dataIndex="date_created"
           title="Ngày yêu cầu"
           sorter
